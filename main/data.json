@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "title": "Barbados Budget – What Citizens Pay & What They Get",
+    "subtitle": "Citizen view of government revenue and spending • FY2025/26 revised estimates • BDS$ millions",
+    "unit": "BDS$ millions",
+    "unitShort": "M",
+    "currencySymbol": "$",
+    "source": "Source: Barbados Parliament Mid-Year Review Report FY2025/26.",
+    "sourceNote": "Revenue values are official revised estimates. Right-hand categories are a citizen-view grouping for communication and are fully editable."
+  },
+  "revenue": [
+    { "label": "Income & profits",       "value": 1379.13, "note": "Personal and company taxes" },
+    { "label": "Goods & services",       "value": 1655.47, "note": "Mainly VAT and similar taxes" },
+    { "label": "International trade",    "value": 285.78,  "note": "Import duties and trade taxes" },
+    { "label": "Property",               "value": 226.38,  "note": "Land and property taxes" },
+    { "label": "Non-tax revenue",        "value": 194.69,  "note": "Fees, charges and other income" },
+    { "label": "Other revenue & grants", "value": 123.06,  "note": "Other inflows and grants" }
+  ],
+  "spending": [
+    { "label": "Education & skills",                 "value": 289.80,  "note": "Schools, training, tertiary support" },
+    { "label": "Healthcare & wellness",              "value": 376.20,  "note": "Hospitals, clinics, public health" },
+    { "label": "Welfare, pensions & social support", "value": 650.00,  "note": "Transfers to households and support schemes" },
+    { "label": "Roads, water & infrastructure",      "value": 549.80,  "note": "Roads, water works, physical infrastructure" },
+    { "label": "Police, courts & public safety",     "value": 280.00,  "note": "Security, justice and safety" },
+    { "label": "Public administration",              "value": 1041.91, "note": "Core government operations and services" },
+    { "label": "Debt interest",                      "value": 718.02,  "note": "The cost of servicing debt", "tone": "debt" }
+  ]
+}

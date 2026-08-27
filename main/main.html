@@ -5,25 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Barbados Budget – Citizen View Sankey</title>
 <style>
+  /* Layout / neutral tokens. Every data colour is injected from THEME in the
+     script below, so colours have exactly one source of truth. */
   :root{
     --bg:#f5f7fa;
     --panel:#ffffff;
     --text:#16202a;
-    --muted:#62707d;
+    --muted:#4d5b68;
     --border:#dbe2e8;
-
-    --barbados-blue:#0b2f6b;
-    --barbados-gold:#f2b632;
-
-    --revenue:#8f99a4;
-    --revenue-dark:#6f7781;
-    --spend:#2e6bb6;
-    --spend-light:#dce9f8;
-    --deficit:#c23b3b;
-    --surplus:#1f8f4d;
-    --soft-red:#fbe7e7;
-    --soft-green:#e5f6ea;
-    --soft-gray:#eef2f5;
   }
 
   *{box-sizing:border-box}
@@ -31,7 +20,7 @@
     margin:0;
     background:var(--bg);
     color:var(--text);
-    font-family:Inter, Arial, Helvetica, sans-serif;
+    font-family:system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   }
 
   .page{
@@ -53,30 +42,16 @@
   .flag{
     width:72px;
     height:48px;
-    display:grid;
-    grid-template-columns:1fr 1fr 1fr;
-    overflow:hidden;
     border-radius:4px;
     box-shadow:0 0 0 1px rgba(0,0,0,.08);
     flex:0 0 auto;
-  }
-  .flag .b{background:#00267f}
-  .flag .y{background:#ffc726; position:relative}
-  .flag .y::after{
-    content:"♆";
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-52%) rotate(180deg);
-    font-size:30px;
-    color:#111;
-    font-family:Georgia, serif;
+    display:block;
   }
 
   h1{
     margin:0;
     text-align:center;
-    color:var(--barbados-blue);
+    color:var(--brand);
     line-height:1.05;
     font-size:42px;
     letter-spacing:-1px;
@@ -110,7 +85,7 @@
   .card .k{
     font-size:12px;
     font-weight:800;
-    color:#5a6672;
+    color:#4a5561;
     text-transform:uppercase;
     letter-spacing:.6px;
     margin-bottom:6px;
@@ -123,19 +98,17 @@
   .card .s{
     margin-top:6px;
     font-size:13px;
-    color:#607080;
+    color:var(--muted);
   }
   .card.revenue{background:var(--soft-gray)}
-  .card.revenue .v{color:#434c56}
-  .card.spending{background:#eef5fd}
-  .card.spending .v{color:#194f95}
-  .card.result.negative{background:var(--soft-red); border-color:#efcaca}
+  .card.revenue .v{color:var(--revenue-dark)}
+  .card.spending{background:var(--soft-blue)}
+  .card.spending .v{color:var(--spend-dark)}
+  .card.result.negative{background:var(--soft-red); border-color:var(--deficit-border)}
   .card.result.negative .v{color:var(--deficit)}
-  .card.result.positive{background:var(--soft-green); border-color:#cbe7d4}
+  .card.result.positive{background:var(--soft-green); border-color:var(--surplus-border)}
   .card.result.positive .v{color:var(--surplus)}
-  .card.message{
-    background:#f8fafc;
-  }
+  .card.message{background:#f8fafc}
   .card.message .v{
     font-size:18px;
     font-weight:800;
@@ -145,33 +118,41 @@
 
   #sankeyWrap{
     width:100%;
-    min-height:760px;
     position:relative;
   }
-  svg{
+  svg#sankey{
     display:block;
     width:100%;
     height:auto;
+    overflow:visible;
   }
 
-  .panel-title{
-    fill:#fff;
-    font-size:18px;
-    font-weight:800;
-    letter-spacing:.4px;
+  /* Hover-dim: while a flow is hovered everything else recedes. */
+  #sankey .flow{transition:opacity .12s ease}
+  #sankey.is-hovering .flow{opacity:.16}
+  #sankey.is-hovering .flow.is-active{opacity:1}
+  #sankey .hit{fill:transparent; cursor:pointer}
+
+  #tooltip{
+    position:absolute;
+    z-index:5;
+    pointer-events:none;
+    opacity:0;
+    transform:translate(-50%,-100%);
+    transition:opacity .1s ease;
+    background:#12202f;
+    color:#fff;
+    padding:9px 12px;
+    border-radius:9px;
+    font-size:13px;
+    line-height:1.4;
+    max-width:280px;
+    box-shadow:0 6px 20px rgba(0,0,0,.28);
   }
-  .label{
-    font-size:18px;
-    font-weight:700;
-  }
-  .value{
-    font-size:26px;
-    font-weight:900;
-  }
-  .tiny{
-    font-size:11px;
-    fill:#67727f;
-  }
+  #tooltip.is-visible{opacity:1}
+  #tooltip .t-label{font-weight:800; display:block}
+  #tooltip .t-value{font-weight:700; display:block; margin-top:2px}
+  #tooltip .t-note{display:block; margin-top:4px; color:#c3d0dd}
 
   .legend-row{
     display:grid;
@@ -193,7 +174,7 @@
   .legend-box p{
     margin:7px 0;
     font-size:13px;
-    color:#4d5b68;
+    color:var(--muted);
     line-height:1.45;
   }
 
@@ -206,11 +187,28 @@
     color:#43505d;
     font-size:13px;
   }
+  .edit-note.is-warning{
+    background:#fdf6e7;
+    border-color:#ecd9a8;
+    color:#6b5312;
+  }
 
   code{
     background:#eef3f7;
     padding:1px 5px;
     border-radius:4px;
+  }
+
+  /* Screen-reader / copy-paste equivalent of the chart. */
+  .sr-only{
+    position:absolute;
+    width:1px;height:1px;
+    padding:0;margin:-1px;
+    overflow:hidden;
+    clip:rect(0 0 0 0);
+    clip-path:inset(50%);
+    white-space:nowrap;
+    border:0;
   }
 
   @media (max-width:1100px){
@@ -219,37 +217,82 @@
     h1{font-size:32px}
     .subtitle{font-size:18px}
   }
+  /* Below this width the chart would scale down until its labels are
+     unreadable, so pan it horizontally at a legible size instead. */
+  @media (max-width:1000px){
+    #sankeyWrap{
+      overflow-x:auto;
+      -webkit-overflow-scrolling:touch;
+    }
+    svg#sankey{
+      min-width:1000px;
+      overflow:hidden;
+    }
+  }
+
   @media (max-width:760px){
     .page{padding:16px}
     .summary{grid-template-columns:1fr}
     .flag{display:none}
+  }
+
+  @media print{
+    body{background:#fff}
+    .page{box-shadow:none; margin:0; max-width:none; padding:0}
+    #tooltip{display:none !important}
+    #sankeyWrap, .summary, .legend-row{break-inside:avoid; page-break-inside:avoid}
+    .edit-note{display:none}
+    #sankey .flow{opacity:1 !important}
   }
 </style>
 </head>
 <body>
 <div class="page">
   <div class="title-row">
-    <div class="flag"><div class="b"></div><div class="y"></div><div class="b"></div></div>
+    <svg class="flag" viewBox="0 0 72 48" role="img" aria-label="Flag of Barbados">
+      <rect x="0" y="0" width="24" height="48" fill="#00267f"/>
+      <rect x="24" y="0" width="24" height="48" fill="#ffc726"/>
+      <rect x="48" y="0" width="24" height="48" fill="#00267f"/>
+      <g fill="#111" transform="translate(36 24) scale(0.85) translate(-12 -16)">
+        <path d="M11 8h2v24h-2z"/>
+        <path d="M4 12h16v2H4z"/>
+        <path d="M3 5h2v9H3zM19 5h2v9h-2z"/>
+        <path d="M12 1l3.2 7H8.8z"/>
+      </g>
+    </svg>
     <div>
-      <h1>Barbados Budget – What Citizens Pay &amp; What They Get</h1>
-      <div class="subtitle">Citizen view of government revenue and spending • FY2025/26 revised estimates • BDS$ millions</div>
-      <div class="subnote">Incoming money is shown in grey. Fiscal result automatically turns green for surplus or red for deficit.</div>
+      <h1 id="pageTitle">Barbados Budget – What Citizens Pay &amp; What They Get</h1>
+      <div class="subtitle" id="pageSubtitle">Citizen view of government revenue and spending • FY2025/26 revised estimates • BDS$ millions</div>
+      <div class="subnote">Ribbon thickness is proportional to the amount of money. Incoming money is shown in grey; the fiscal result turns green for a surplus and red for a deficit.</div>
     </div>
-    <div class="flag"><div class="b"></div><div class="y"></div><div class="b"></div></div>
+    <svg class="flag" viewBox="0 0 72 48" role="img" aria-label="Flag of Barbados">
+      <rect x="0" y="0" width="24" height="48" fill="#00267f"/>
+      <rect x="24" y="0" width="24" height="48" fill="#ffc726"/>
+      <rect x="48" y="0" width="24" height="48" fill="#00267f"/>
+      <g fill="#111" transform="translate(36 24) scale(0.85) translate(-12 -16)">
+        <path d="M11 8h2v24h-2z"/>
+        <path d="M4 12h16v2H4z"/>
+        <path d="M3 5h2v9H3zM19 5h2v9h-2z"/>
+        <path d="M12 1l3.2 7H8.8z"/>
+      </g>
+    </svg>
   </div>
 
   <div id="summary" class="summary"></div>
 
   <div id="sankeyWrap">
-    <svg id="sankey" viewBox="0 0 1500 760" preserveAspectRatio="xMidYMid meet"></svg>
+    <svg id="sankey" role="img" aria-labelledby="sankeyTitle sankeyDesc" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="tooltip" role="status" aria-live="polite"></div>
   </div>
+
+  <div id="dataTable" class="sr-only"></div>
 
   <div class="legend-row">
     <div class="legend-box">
       <h3>How to read it</h3>
       <p><strong>Left side:</strong> where government money comes from.</p>
       <p><strong>Right side:</strong> a <em>citizen-friendly</em> grouping of what that money pays for.</p>
-      <p><strong>Middle:</strong> the full spending envelope for the year.</p>
+      <p><strong>Middle:</strong> the full spending envelope for the year. Every ribbon is drawn to scale, so a ribbon twice as thick carries twice the money.</p>
     </div>
     <div class="legend-box">
       <h3>About the citizen view</h3>
@@ -258,235 +301,764 @@
     </div>
     <div class="legend-box">
       <h3>Fiscal result</h3>
-      <p>If revenue is less than spending, the chart shows a <strong style="color:#c23b3b">red deficit / borrowing need</strong>.</p>
-      <p>If revenue is greater than spending, it will show a <strong style="color:#1f8f4d">green surplus</strong>.</p>
+      <p>If revenue is less than spending, the chart shows a <strong id="legendDeficit">red deficit / borrowing need</strong> entering on the left.</p>
+      <p>If revenue is greater than spending, it shows a <strong id="legendSurplus">green surplus</strong> leaving on the right.</p>
     </div>
   </div>
 
-  <div class="edit-note">
-    <strong>Editing:</strong> search this file for <code>EDIT DATA HERE</code>.  
-    Change any labels, notes or values in the arrays and the chart redraws automatically.
+  <div class="edit-note" id="editNote">
+    <strong>Editing:</strong> the figures live in <code>data.json</code> next to this file — change the labels, notes or values there and the chart redraws.
+    If <code>data.json</code> cannot be loaded (for example when opening this file directly from disk in some browsers), the chart falls back to the copy of the same data embedded under <code>EDIT DATA HERE</code> in this file.
   </div>
 </div>
 
 <script>
 /* =========================================================
-   EDIT DATA HERE
+   EDIT DATA HERE  (fallback copy of data.json)
    Values are BDS$ millions.
    Revenue is official FY2025/26 revised mid-year data.
    Spending on the right is a citizen-view grouping that is
    deliberately easy to understand and easy to edit.
+
+   `tone` selects a styling variant instead of matching on the
+   label text, so renaming a category never changes its colour.
+   Supported tones: "spend" (default), "debt".
    ========================================================= */
 
-const revenueData = [
-  { label:"Income & profits",          value:1379.13, color:"#8f99a4", note:"Personal and company taxes" },
-  { label:"Goods & services",          value:1655.47, color:"#8f99a4", note:"Mainly VAT and similar taxes" },
-  { label:"International trade",       value:285.78,  color:"#8f99a4", note:"Import duties and trade taxes" },
-  { label:"Property",                  value:226.38,  color:"#8f99a4", note:"Land and property taxes" },
-  { label:"Non-tax revenue",           value:194.69,  color:"#8f99a4", note:"Fees, charges and other income" },
-  { label:"Other revenue & grants",    value:123.06,  color:"#8f99a4", note:"Other inflows and grants" }
-];
-
-const citizenSpendData = [
-  { label:"Education & skills",                value:289.80,  color:"#2e6bb6", note:"Schools, training, tertiary support" },
-  { label:"Healthcare & wellness",             value:376.20,  color:"#2e6bb6", note:"Hospitals, clinics, public health" },
-  { label:"Welfare, pensions & social support",value:650.00,  color:"#2e6bb6", note:"Transfers to households and support schemes" },
-  { label:"Roads, water & infrastructure",     value:549.80,  color:"#2e6bb6", note:"Roads, water works, physical infrastructure" },
-  { label:"Police, courts & public safety",    value:280.00,  color:"#2e6bb6", note:"Security, justice and safety" },
-  { label:"Public administration",             value:1041.91, color:"#2e6bb6", note:"Core government operations and services" },
-  { label:"Debt interest",                     value:718.02,  color:"#2e6bb6", note:"The cost of servicing debt" }
-];
-
-/* ========================================================= */
-
-const svg = document.getElementById("sankey");
-const NS = "http://www.w3.org/2000/svg";
-const summary = document.getElementById("summary");
-
-const cfg = {
-  w:1500,
-  h:760,
-  leftX:80,
-  leftW:250,
-  centerX:590,
-  centerW:300,
-  rightX:1095,
-  rightW:320,
-  top:120,
-  leftGap:16,
-  rightGap:16,
-  nodeH:58,
-  nodeHRight:62,
-  ribbonMin:6,
-  ribbonMax:72
+const DEFAULT_DATA = {
+  meta:{
+    title:"Barbados Budget – What Citizens Pay & What They Get",
+    subtitle:"Citizen view of government revenue and spending • FY2025/26 revised estimates • BDS$ millions",
+    unit:"BDS$ millions",
+    unitShort:"M",
+    currencySymbol:"$",
+    source:"Source: Barbados Parliament Mid-Year Review Report FY2025/26.",
+    sourceNote:"Revenue values are official revised estimates. Right-hand categories are a citizen-view grouping for communication and are fully editable."
+  },
+  revenue:[
+    { label:"Income & profits",       value:1379.13, note:"Personal and company taxes" },
+    { label:"Goods & services",       value:1655.47, note:"Mainly VAT and similar taxes" },
+    { label:"International trade",    value:285.78,  note:"Import duties and trade taxes" },
+    { label:"Property",               value:226.38,  note:"Land and property taxes" },
+    { label:"Non-tax revenue",        value:194.69,  note:"Fees, charges and other income" },
+    { label:"Other revenue & grants", value:123.06,  note:"Other inflows and grants" }
+  ],
+  spending:[
+    { label:"Education & skills",                 value:289.80,  note:"Schools, training, tertiary support" },
+    { label:"Healthcare & wellness",              value:376.20,  note:"Hospitals, clinics, public health" },
+    { label:"Welfare, pensions & social support", value:650.00,  note:"Transfers to households and support schemes" },
+    { label:"Roads, water & infrastructure",      value:549.80,  note:"Roads, water works, physical infrastructure" },
+    { label:"Police, courts & public safety",     value:280.00,  note:"Security, justice and safety" },
+    { label:"Public administration",              value:1041.91, note:"Core government operations and services" },
+    { label:"Debt interest",                      value:718.02,  note:"The cost of servicing debt", tone:"debt" }
+  ]
 };
 
-function $el(name, attrs={}){
-  const e = document.createElementNS(NS,name);
-  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+/* ---------------------------------------------------------
+   THEME — the single source of truth for every colour.
+   The CSS custom properties below are generated from it, so a
+   colour is never written twice.
+   --------------------------------------------------------- */
+const THEME = {
+  brand:            '#0b2f6b',
+  brandDeep:        '#08285b',
+  gold:             '#f2b632',
+  revenue:          '#8f99a4',
+  revenueDark:      '#434c56',
+  revenueFill:      '#eef2f5',
+  revenueStroke:    '#cfd7df',
+  spend:            '#2e6bb6',
+  spendDark:        '#194f95',
+  spendFill:        '#eaf2fc',
+  spendStroke:      '#b9d0ee',
+  debt:             '#a43131',
+  debtFill:         '#f7ebeb',
+  debtStroke:       '#d6a3a3',
+  deficit:          '#c23b3b',
+  deficitDeep:      '#922e2e',
+  deficitBorder:    '#efb3b3',
+  surplus:          '#1f8f4d',
+  surplusDeep:      '#176c3a',
+  surplusBorder:    '#b8ddc4',
+  softRed:          '#fbe7e7',
+  softGreen:        '#e5f6ea',
+  softGray:         '#eef2f5',
+  softBlue:         '#eef5fd',
+  headerLeft:       '#4a525b',
+  ink:              '#16202a',
+  inkSoft:          '#303741',
+  muted:            '#4d5b68',
+  rule:             '#d7dde4',
+  onBrand:          '#ffffff',
+  onBrandSoft:      '#dfe9f8',
+  onBrandGood:      '#9fe0b6',
+  onBrandBad:       '#ffc7c7'
+};
+
+const CSS_VARS = {
+  '--brand':THEME.brand,
+  '--revenue-dark':THEME.revenueDark,
+  '--spend-dark':THEME.spendDark,
+  '--deficit':THEME.deficit,
+  '--deficit-border':THEME.deficitBorder,
+  '--surplus':THEME.surplus,
+  '--surplus-border':THEME.surplusBorder,
+  '--soft-red':THEME.softRed,
+  '--soft-green':THEME.softGreen,
+  '--soft-gray':THEME.softGray,
+  '--soft-blue':THEME.softBlue
+};
+Object.entries(CSS_VARS).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
+
+/* ---------------------------------------------------------
+   Layout configuration. Every coordinate used by the renderer
+   comes from here — no magic numbers in the drawing code.
+   The canvas height is derived from the data at draw time.
+   --------------------------------------------------------- */
+const cfg = {
+  w:1500,
+  chartTop:140,          // first pixel of the node stacks
+  stackH:600,            // total ribbon height on each side (the budget envelope)
+  nodeGap:8,             // visual gap between stacked nodes
+  nodeMinH:2,            // cosmetic floor so a tiny flow never disappears
+  barW:22,               // width of a node bar
+  leftLabelX:24,         // left edge of the left-hand label column
+  leftLabelRight:378,    // labels are right-aligned to here
+  leftBarX:396,
+  centerX:600,
+  centerW:300,
+  rightBarX:1082,
+  rightLabelX:1120,      // left edge of the right-hand label column
+  rightLabelRight:1476,
+  headerY:64,
+  headerH:42,
+  headerLeftX:24,
+  headerLeftW:392,
+  headerRightW:392,
+  labelLine:19,          // line height inside a label block
+  labelPad:8,            // minimum vertical breathing room between label blocks
+  leaderThreshold:3,     // draw a leader line once a label is nudged this far
+  footerGap:38,
+  footerH:64
+};
+
+const svg = document.getElementById('sankey');
+const summaryEl = document.getElementById('summary');
+const tooltipEl = document.getElementById('tooltip');
+const wrapEl = document.getElementById('sankeyWrap');
+const tableEl = document.getElementById('dataTable');
+const NS = 'http://www.w3.org/2000/svg';
+
+/* ---------------------------- helpers ---------------------------- */
+
+function $el(name, attrs={}, parent=null){
+  const e = document.createElementNS(NS, name);
+  for(const [k,v] of Object.entries(attrs)){
+    if(v !== null && v !== undefined) e.setAttribute(k, v);
+  }
+  if(parent) parent.appendChild(e);
   return e;
 }
-function add(node){ svg.appendChild(node); return node; }
-function rect(x,y,w,h,fill,rx=10,stroke='none',sw=1){
-  return add($el('rect',{x,y,width:w,height:h,fill,rx,stroke,'stroke-width':sw}));
-}
-function txt(x,y,content,opts={}){
+
+function txt(parent, x, y, content, opts={}){
   const t = $el('text',{
-    x,y,
-    'font-size':opts.size || 16,
-    'font-weight':opts.weight || 400,
-    fill:opts.fill || '#16202a',
-    'text-anchor':opts.anchor || 'start'
-  });
+    x, y,
+    'font-size':opts.size ?? 16,
+    'font-weight':opts.weight ?? 400,
+    fill:opts.fill ?? THEME.ink,
+    'text-anchor':opts.anchor ?? 'start',
+    'letter-spacing':opts.tracking ?? null
+  }, parent);
   t.textContent = content;
-  return add(t);
+  return t;
 }
-function line(x1,y1,x2,y2,stroke='#d8dee5',sw=1){
-  return add($el('line',{x1,y1,x2,y2,stroke,'stroke-width':sw}));
-}
-function path(d, fill, opacity=.7){
-  return add($el('path',{d,fill,opacity}));
-}
+
+function sum(arr){ return arr.reduce((a,b)=>a + b.value, 0); }
+function round2(v){ return Math.round(v*100)/100; }
+
+/* Plain number, used where the unit is already established by a header. */
 function money(v){
   return v.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
 }
-function sum(arr){ return arr.reduce((a,b)=>a+b.value,0); }
+/* Number carrying its unit, used anywhere the figure stands alone. */
+let moneyUnit = v => money(v);
 
-const totalRevenue = sum(revenueData);
-const totalSpending = sum(citizenSpendData);
-const net = +(totalRevenue - totalSpending).toFixed(2); // positive = surplus, negative = deficit
-
-function ribbonWidth(value){
-  const max = Math.max(...revenueData.map(d=>d.value), ...citizenSpendData.map(d=>d.value), Math.abs(net));
-  return cfg.ribbonMin + (value/max)*(cfg.ribbonMax-cfg.ribbonMin);
+function pct(v, total){
+  if(!total) return '0.0%';
+  return (v/total*100).toFixed(1) + '%';
 }
 
-function ribbon(x1,y1,x2,y2,w,color,opacity=.72){
-  const c1 = x1 + 140;
-  const c2 = x2 - 140;
-  const d = [
-    `M ${x1} ${y1-w/2}`,
-    `C ${c1} ${y1-w/2}, ${c2} ${y2-w/2}, ${x2} ${y2-w/2}`,
-    `L ${x2} ${y2+w/2}`,
-    `C ${c2} ${y2+w/2}, ${c1} ${y1+w/2}, ${x1} ${y1+w/2}`,
+/* Measure a string in SVG user units using a throwaway text node. */
+let measureNode = null;
+function measure(text, size, weight){
+  if(!measureNode){
+    measureNode = $el('text',{x:-9999, y:-9999, visibility:'hidden'}, svg);
+  }
+  measureNode.setAttribute('font-size', size);
+  measureNode.setAttribute('font-weight', weight);
+  measureNode.textContent = text;
+  return measureNode.getComputedTextLength();
+}
+
+/* Greedy word wrap with a hard line cap and an ellipsis on overflow. */
+function wrapText(text, maxWidth, size, weight, maxLines){
+  const words = String(text).split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = '';
+
+  for(const word of words){
+    const candidate = current ? current + ' ' + word : word;
+    if(measure(candidate, size, weight) <= maxWidth || !current){
+      current = candidate;
+    } else {
+      lines.push(current);
+      current = word;
+      if(lines.length === maxLines) break;
+    }
+  }
+  if(lines.length < maxLines && current) lines.push(current);
+
+  // Anything that still does not fit gets truncated with an ellipsis.
+  const consumed = lines.join(' ');
+  if(consumed !== words.join(' ')){
+    let last = lines[lines.length-1] ?? '';
+    while(last && measure(last + '…', size, weight) > maxWidth){
+      last = last.slice(0, -1).trimEnd();
+    }
+    lines[lines.length-1] = last + '…';
+  }
+  for(let i=0;i<lines.length;i++){
+    let l = lines[i];
+    while(measure(l, size, weight) > maxWidth && l.length > 1){
+      l = l.slice(0,-1);
+      lines[i] = l.slice(0,-1) + '…';
+      l = lines[i];
+    }
+  }
+  return lines;
+}
+
+/* --------------------------- data loading --------------------------- */
+
+function normaliseRow(row, defaultTone){
+  return {
+    label: String(row.label ?? 'Unlabelled'),
+    value: Number(row.value),
+    note: row.note ? String(row.note) : '',
+    tone: row.tone ? String(row.tone) : defaultTone
+  };
+}
+
+function validate(raw){
+  if(!raw || typeof raw !== 'object') return null;
+  if(!Array.isArray(raw.revenue) || !Array.isArray(raw.spending)) return null;
+  if(!raw.revenue.length || !raw.spending.length) return null;
+
+  const revenue = raw.revenue.map(r=>normaliseRow(r,'revenue'));
+  const spending = raw.spending.map(r=>normaliseRow(r,'spend'));
+  const finite = r => Number.isFinite(r.value) && r.value >= 0;
+  if(!revenue.every(finite) || !spending.every(finite)) return null;
+
+  return {
+    meta: Object.assign({}, DEFAULT_DATA.meta, raw.meta || {}),
+    revenue,
+    spending
+  };
+}
+
+async function loadData(){
+  try{
+    const res = await fetch('data.json', {cache:'no-store'});
+    if(!res.ok) throw new Error('HTTP ' + res.status);
+    const parsed = validate(await res.json());
+    if(!parsed) throw new Error('data.json did not match the expected shape');
+    return {data:parsed, source:'data.json'};
+  }catch(err){
+    console.info('Falling back to the data embedded in main.html:', err.message);
+    return {data:validate(DEFAULT_DATA), source:'embedded'};
+  }
+}
+
+/* ---------------------------- model ---------------------------- */
+
+/* Builds both stacks. Conservation holds by construction: a deficit enters on
+   the left and a surplus leaves on the right, so inflow === outflow === the
+   budget envelope, and the two stacks are exactly the same height. */
+function buildModel(data){
+  const totalRevenue = round2(sum(data.revenue));
+  const totalSpending = round2(sum(data.spending));
+  const net = round2(totalRevenue - totalSpending);
+  const envelope = Math.max(totalRevenue, totalSpending);
+
+  const inflows = data.revenue.map(d=>Object.assign({side:'in'}, d));
+  if(net < 0){
+    inflows.push({
+      side:'in', tone:'deficit', label:'Deficit / borrowing need',
+      value:Math.abs(net), note:'Spending exceeded revenue, so the gap had to be financed'
+    });
+  }
+
+  const outflows = data.spending.map(d=>Object.assign({side:'out'}, d));
+  if(net > 0){
+    outflows.push({
+      side:'out', tone:'surplus', label:'Surplus',
+      value:net, note:'Revenue exceeded spending'
+    });
+  }
+
+  return {data, totalRevenue, totalSpending, net, envelope, inflows, outflows};
+}
+
+const TONES = {
+  revenue: {ribbon:THEME.revenue,  bar:THEME.revenue,  fill:THEME.revenueFill, stroke:THEME.revenueStroke, value:THEME.revenueDark, label:THEME.inkSoft},
+  spend:   {ribbon:THEME.spend,    bar:THEME.spend,    fill:THEME.spendFill,   stroke:THEME.spendStroke,   value:THEME.spendDark,   label:THEME.inkSoft},
+  debt:    {ribbon:THEME.debt,     bar:THEME.debt,     fill:THEME.debtFill,    stroke:THEME.debtStroke,    value:THEME.debt,        label:THEME.inkSoft},
+  deficit: {ribbon:THEME.deficit,  bar:THEME.deficit,  fill:THEME.softRed,     stroke:THEME.deficitBorder, value:THEME.deficit,     label:THEME.deficitDeep},
+  surplus: {ribbon:THEME.surplus,  bar:THEME.surplus,  fill:THEME.softGreen,   stroke:THEME.surplusBorder, value:THEME.surplus,     label:THEME.surplusDeep}
+};
+const toneOf = node => TONES[node.tone] || TONES.spend;
+
+/* Assigns every node a height proportional to its share of the envelope, then
+   stacks it. Node height === ribbon width, so the ribbons meet the bars edge
+   to edge and the picture stays honest. */
+function layoutStack(nodes, envelope){
+  const scale = cfg.stackH / envelope;
+  let cursor = 0;
+  const items = nodes.map(node=>{
+    // The floor is purely cosmetic — without it a sub-pixel flow would vanish.
+    // It is the only place the drawing departs from exact proportionality, and
+    // the central block is sized from these heights so nothing drifts.
+    const h = Math.max(node.value * scale, cfg.nodeMinH);
+    const item = {node, h, offset:cursor, tone:toneOf(node)};
+    cursor += h;
+    return item;
+  });
+  return {items, totalH:cursor};
+}
+
+/* Places a laid-out stack on the canvas: `top` positions the bars (which carry
+   gaps between them) and `centerTop` positions the contiguous ribbon ends. */
+function positionStack(stack, top, centerTop){
+  let y = top;
+  for(const item of stack.items){
+    item.y = y;
+    item.cy = y + item.h/2;
+    item.centerY = centerTop + item.offset;
+    y += item.h + cfg.nodeGap;
+  }
+}
+
+/* Nudges label blocks apart so neighbouring small flows stay readable, then
+   corrects back upwards if the pass pushed the stack past its bottom. */
+function decollide(items, topLimit, bottomLimit){
+  if(!items.length) return;
+
+  // Push down until nothing overlaps its predecessor.
+  items[0].labelY = Math.max(items[0].labelY, topLimit + items[0].labelH/2);
+  for(let i=1;i<items.length;i++){
+    const prev = items[i-1], cur = items[i];
+    const minY = prev.labelY + prev.labelH/2 + cfg.labelPad + cur.labelH/2;
+    if(cur.labelY < minY) cur.labelY = minY;
+  }
+
+  // Then pull back up if that ran past the bottom, again without overlapping.
+  const last = items[items.length-1];
+  if(last.labelY + last.labelH/2 > bottomLimit){
+    last.labelY = bottomLimit - last.labelH/2;
+    for(let i=items.length-2;i>=0;i--){
+      const next = items[i+1];
+      const maxY = next.labelY - next.labelH/2 - cfg.labelPad - items[i].labelH/2;
+      if(items[i].labelY > maxY) items[i].labelY = maxY;
+    }
+    // If even a tight pack does not fit, start at the top and accept the
+    // overrun rather than drawing labels over the header.
+    if(items[0].labelY - items[0].labelH/2 < topLimit){
+      let y = topLimit;
+      for(const item of items){
+        item.labelY = y + item.labelH/2;
+        y += item.labelH + cfg.labelPad;
+      }
+    }
+  }
+}
+
+const LABEL_SIZE = 16, LABEL_WEIGHT = 800, VALUE_SIZE = 20, VALUE_WEIGHT = 900;
+
+/* Wraps each label and records the height of its block. Runs before the canvas
+   is sized, so the label column can widen the chart when it needs to. */
+function measureLabels(items, maxWidth){
+  for(const item of items){
+    item.lines = wrapText(item.node.label, maxWidth, LABEL_SIZE, LABEL_WEIGHT, 2);
+    item.labelH = item.lines.length * cfg.labelLine + VALUE_SIZE + 4;
+  }
+}
+
+/* Vertical room a label column needs when every block is stacked tightly. */
+function labelColumnHeight(items){
+  if(!items.length) return 0;
+  return items.reduce((s,i)=>s + i.labelH, 0) + cfg.labelPad * (items.length - 1);
+}
+
+/* ---------------------------- drawing ---------------------------- */
+
+function ribbonPath(x1, top1, x2, top2, w){
+  const bend = (x2 - x1) * 0.5;
+  const c1 = x1 + bend;
+  const c2 = x2 - bend;
+  return [
+    `M ${x1} ${top1}`,
+    `C ${c1} ${top1}, ${c2} ${top2}, ${x2} ${top2}`,
+    `L ${x2} ${top2 + w}`,
+    `C ${c2} ${top2 + w}, ${c1} ${top1 + w}, ${x1} ${top1 + w}`,
     'Z'
   ].join(' ');
-  path(d,color,opacity);
 }
 
-function drawSummary(){
-  const resultType = net >= 0 ? 'positive' : 'negative';
-  const resultLabel = net >= 0 ? 'SURPLUS' : 'DEFICIT';
-  const resultValue = Math.abs(net);
+function drawSummary(model){
+  const {net, totalRevenue, totalSpending} = model;
+  const isSurplus = net >= 0;
+  const resultType = isSurplus ? 'positive' : 'negative';
+  const resultLabel = isSurplus ? 'SURPLUS' : 'DEFICIT';
 
-  summary.innerHTML = `
-    <div class="card revenue">
-      <div class="k">Total revenue</div>
-      <div class="v">${money(totalRevenue)}</div>
-      <div class="s">All regular revenue sources combined</div>
-    </div>
-    <div class="card spending">
-      <div class="k">Total spending</div>
-      <div class="v">${money(totalSpending)}</div>
-      <div class="s">Citizen-view grouped expenditure</div>
-    </div>
-    <div class="card result ${resultType}">
-      <div class="k">Budget result</div>
-      <div class="v">${resultLabel}: ${money(resultValue)}</div>
-      <div class="s">${net >= 0 ? 'More money came in than went out' : 'More money went out than came in'}</div>
-    </div>
-    <div class="card message">
-      <div class="k">Plain-English takeaway</div>
-      <div class="v">${net >= 0 ? 'The country generated a surplus this year.' : 'The country spent more than it collected, so the gap had to be financed.'}</div>
-      <div class="s">Use this box to tell the public what the numbers mean.</div>
-    </div>
-  `;
-}
+  summaryEl.replaceChildren();
+  const cards = [
+    {cls:'revenue',  k:'Total revenue',  v:moneyUnit(totalRevenue),  s:'All regular revenue sources combined'},
+    {cls:'spending', k:'Total spending', v:moneyUnit(totalSpending), s:'Citizen-view grouped expenditure'},
+    {cls:'result ' + resultType, k:'Budget result', v:`${resultLabel}: ${moneyUnit(Math.abs(net))}`,
+     s: isSurplus ? 'More money came in than went out' : 'More money went out than came in'},
+    {cls:'message', k:'Plain-English takeaway',
+     v: isSurplus ? 'The country generated a surplus this year.'
+                  : 'The country spent more than it collected, so the gap had to be financed.',
+     s:'Use this box to tell the public what the numbers mean.'}
+  ];
 
-function draw(){
-  svg.innerHTML = '';
-
-  // Section headers
-  rect(32,68,360,42,'#505861',10);
-  txt(212,95,'WHERE THE MONEY COMES FROM',{size:18,weight:800,fill:'#fff',anchor:'middle'});
-  rect(1048,68,400,42,'#0b2f6b',10);
-  txt(1248,95,'WHAT CITIZENS GET FROM IT',{size:18,weight:800,fill:'#fff',anchor:'middle'});
-
-  // Central block
-  const centerY = 200;
-  const centerH = 340;
-  rect(cfg.centerX, centerY, cfg.centerW, centerH, '#0b2f6b', 20, '#08285b', 3);
-  rect(cfg.centerX+9, centerY+9, cfg.centerW-18, centerH-18, 'none', 16, '#ffffff', 2);
-
-  txt(cfg.centerX + cfg.centerW/2, centerY + 64, '♆', {size:44,weight:700,fill:'#f2b632',anchor:'middle'});
-  txt(cfg.centerX + cfg.centerW/2, centerY + 138, 'Government',{size:30,weight:800,fill:'#fff',anchor:'middle'});
-  txt(cfg.centerX + cfg.centerW/2, centerY + 175, 'Spending',{size:30,weight:800,fill:'#fff',anchor:'middle'});
-  txt(cfg.centerX + cfg.centerW/2, centerY + 238, money(totalSpending),{size:42,weight:900,fill:'#f2b632',anchor:'middle'});
-  txt(cfg.centerX + cfg.centerW/2, centerY + 270, 'Total budget envelope',{size:15,weight:600,fill:'#dfe9f8',anchor:'middle'});
-  txt(cfg.centerX + cfg.centerW/2, centerY + 305, net >= 0 ? `Includes surplus of ${money(net)}` : `Includes deficit financing of ${money(Math.abs(net))}`, {size:14,weight:700,fill: net >=0 ? '#9fe0b6' : '#ffc7c7',anchor:'middle'});
-
-  // Left side revenue nodes
-  let leftY = 115;
-  const inflowColor = '#8f99a4';
-  revenueData.forEach((d, i) => {
-    const cy = leftY + cfg.nodeH/2;
-    const targetY = centerY + 76 + i*32;
-    ribbon(cfg.leftX + cfg.leftW, cy, cfg.centerX, targetY, ribbonWidth(d.value), d.color, .76);
-
-    rect(cfg.leftX, leftY, cfg.leftW, cfg.nodeH, '#eef2f5', 10, '#cfd7df', 1.3);
-    txt(cfg.leftX + 16, leftY + 23, d.label, {size:18, weight:800, fill:'#303741'});
-    txt(cfg.leftX + 16, leftY + 49, money(d.value), {size:25, weight:900, fill:'#4d5660'});
-    txt(cfg.leftX + cfg.leftW + 12, leftY + 36, d.note, {size:11, weight:500, fill:'#66717d'});
-    leftY += cfg.nodeH + cfg.leftGap;
-  });
-
-  // Deficit financing OR surplus
-  if(net < 0){
-    const val = Math.abs(net);
-    const y = leftY + 12;
-    const cy = y + cfg.nodeH/2;
-    ribbon(cfg.leftX + cfg.leftW, cy, cfg.centerX, centerY + 270, ribbonWidth(val), '#c23b3b', .78);
-    rect(cfg.leftX, y, cfg.leftW, cfg.nodeH, '#fbe7e7', 10, '#efb3b3', 1.4);
-    txt(cfg.leftX + 16, y + 23, 'Deficit / borrowing need', {size:17,weight:800,fill:'#922e2e'});
-    txt(cfg.leftX + 16, y + 49, money(val), {size:24,weight:900,fill:'#c23b3b'});
-    txt(cfg.leftX + cfg.leftW + 12, y + 36, 'Spending exceeded revenue', {size:11,weight:600,fill:'#a03a3a'});
-  }
-
-  // Right side spending nodes
-  let rightY = 108;
-  citizenSpendData.forEach((d, i) => {
-    const cy = rightY + cfg.nodeHRight/2;
-    const sourceY = centerY + 78 + i*37;
-    ribbon(cfg.centerX + cfg.centerW, sourceY, cfg.rightX, cy, ribbonWidth(d.value), d.color, .72);
-
-    const fill = d.label === 'Debt interest' ? '#f7ebeb' : '#eaf2fc';
-    const stroke = d.label === 'Debt interest' ? '#d6a3a3' : '#b9d0ee';
-    const valueFill = d.label === 'Debt interest' ? '#a43131' : '#194f95';
-
-    rect(cfg.rightX, rightY, cfg.rightW, cfg.nodeHRight, fill, 10, stroke, 1.4);
-    txt(cfg.rightX + 16, rightY + 22, d.label, {size:17,weight:800,fill:'#172534'});
-    txt(cfg.rightX + 16, rightY + 48, money(d.value), {size:25,weight:900,fill:valueFill});
-    txt(cfg.rightX + 16, rightY + 62, d.note, {size:10.5,weight:500,fill:'#62707d'});
-    rightY += cfg.nodeHRight + cfg.rightGap;
-  });
-
-  // Footer lines / explanations within svg
-  line(30, 720, 1470, 720, '#d7dde4', 1);
-  txt(34, 740, 'Source: Barbados Parliament Mid-Year Review Report FY2025/26.', {size:12,weight:700,fill:'#45515d'});
-  txt(370, 740, 'Revenue values are official revised estimates. Right-hand categories are a citizen-view grouping for communication and are fully editable.', {size:12,weight:500,fill:'#5f6d7a'});
-
-  // Net result marker
-  if(net >= 0){
-    rect(1110, 674, 310, 30, '#e5f6ea', 8, '#b8ddc4', 1);
-    txt(1265, 694, `SURPLUS: ${money(net)}`, {size:16,weight:900,fill:'#1f8f4d',anchor:'middle'});
-  } else {
-    rect(1110, 674, 310, 30, '#fbe7e7', 8, '#efc0c0', 1);
-    txt(1265, 694, `DEFICIT: ${money(Math.abs(net))}`, {size:16,weight:900,fill:'#c23b3b',anchor:'middle'});
+  for(const c of cards){
+    const el = document.createElement('div');
+    el.className = 'card ' + c.cls;
+    const k = document.createElement('div'); k.className='k'; k.textContent=c.k;
+    const v = document.createElement('div'); v.className='v'; v.textContent=c.v;
+    const s = document.createElement('div'); s.className='s'; s.textContent=c.s;
+    el.append(k,v,s);
+    summaryEl.appendChild(el);
   }
 }
 
-drawSummary();
-draw();
+function drawChart(model){
+  const {data, totalSpending, net, envelope, inflows, outflows} = model;
+
+  svg.replaceChildren();
+  measureNode = null;
+
+  // Accessible name and description for the graphic as a whole.
+  const titleId = 'sankeyTitle', descId = 'sankeyDesc';
+  const titleNode = $el('title',{id:titleId}, svg);
+  titleNode.textContent = data.meta.title;
+  const descNode = $el('desc',{id:descId}, svg);
+  descNode.textContent =
+    `Sankey diagram in ${data.meta.unit}. Revenue of ${money(model.totalRevenue)} flows into a budget ` +
+    `envelope of ${money(envelope)}, of which ${money(totalSpending)} is distributed across ` +
+    `${data.spending.length} citizen-view categories. ` +
+    (net < 0
+      ? `Spending exceeded revenue by ${money(Math.abs(net))}, financed by borrowing.`
+      : `Revenue exceeded spending by ${money(net)}, leaving a surplus.`) +
+    ' The full figures are also available in the data table that follows this graphic.';
+
+  // Vertical extents are derived from the data, never assumed.
+  const leftStack = layoutStack(inflows, envelope);
+  const rightStack = layoutStack(outflows, envelope);
+
+  const leftSpan = leftStack.totalH + cfg.nodeGap * (inflows.length - 1);
+  const rightSpan = rightStack.totalH + cfg.nodeGap * (outflows.length - 1);
+  const centerH = Math.max(leftStack.totalH, rightStack.totalH);
+
+  // Labels are measured before the canvas is sized: with many categories the
+  // label column, not the ribbon stack, is what needs the vertical room.
+  measureLabels(leftStack.items, cfg.leftLabelRight - cfg.leftLabelX);
+  measureLabels(rightStack.items, cfg.rightLabelRight - cfg.rightLabelX);
+
+  const maxSpan = Math.max(
+    leftSpan, rightSpan, centerH,
+    labelColumnHeight(leftStack.items),
+    labelColumnHeight(rightStack.items)
+  );
+
+  const centerTop = cfg.chartTop + (maxSpan - centerH)/2;
+  const contentBottom = cfg.chartTop + maxSpan;
+
+  const height = contentBottom + cfg.footerGap + cfg.footerH;
+  svg.setAttribute('viewBox', `0 0 ${cfg.w} ${height}`);
+
+  // Each stack is centred against the block, so the ribbon bundle always lands
+  // inside it even when the cosmetic height floor stretches one side.
+  positionStack(leftStack,  cfg.chartTop + (maxSpan - leftSpan)/2,  centerTop + (centerH - leftStack.totalH)/2);
+  positionStack(rightStack, cfg.chartTop + (maxSpan - rightSpan)/2, centerTop + (centerH - rightStack.totalH)/2);
+  const left = leftStack.items;
+  const right = rightStack.items;
+
+  // ---- section headers ----
+  const headerRightX = cfg.rightLabelRight - cfg.headerRightW;
+  $el('rect',{x:cfg.headerLeftX, y:cfg.headerY, width:cfg.headerLeftW, height:cfg.headerH, rx:10, fill:THEME.headerLeft}, svg);
+  txt(svg, cfg.headerLeftX + cfg.headerLeftW/2, cfg.headerY + 27, 'WHERE THE MONEY COMES FROM',
+      {size:18, weight:800, fill:THEME.onBrand, anchor:'middle', tracking:.4});
+  $el('rect',{x:headerRightX, y:cfg.headerY, width:cfg.headerRightW, height:cfg.headerH, rx:10, fill:THEME.brand}, svg);
+  txt(svg, headerRightX + cfg.headerRightW/2, cfg.headerY + 27, 'WHAT CITIZENS GET FROM IT',
+      {size:18, weight:800, fill:THEME.onBrand, anchor:'middle', tracking:.4});
+  txt(svg, cfg.headerLeftX, cfg.headerY - 14, `All figures in ${data.meta.unit}`, {size:12, weight:700, fill:THEME.muted});
+
+  // ---- ribbons (drawn first so bars and text sit on top) ----
+  const flowLayer = $el('g',{}, svg);
+  const leftEdge = cfg.leftBarX + cfg.barW;
+  const rightEdge = cfg.centerX + cfg.centerW;
+
+  const flows = [];
+  left.forEach((item,i)=>{
+    const g = $el('g',{class:'flow', 'data-flow':`in-${i}`}, flowLayer);
+    $el('path',{
+      d: ribbonPath(leftEdge, item.y, cfg.centerX, item.centerY, item.h),
+      fill: item.tone.ribbon,
+      opacity: .76
+    }, g);
+    flows.push({g, item, side:'in'});
+  });
+  right.forEach((item,i)=>{
+    const g = $el('g',{class:'flow', 'data-flow':`out-${i}`}, flowLayer);
+    $el('path',{
+      d: ribbonPath(rightEdge, item.centerY, cfg.rightBarX, item.y, item.h),
+      fill: item.tone.ribbon,
+      opacity: .72
+    }, g);
+    flows.push({g, item, side:'out'});
+  });
+
+  // ---- central block ----
+  const centerMid = centerTop + centerH/2;
+  $el('rect',{x:cfg.centerX, y:centerTop, width:cfg.centerW, height:centerH, rx:20,
+              fill:THEME.brand, stroke:THEME.brandDeep, 'stroke-width':3}, svg);
+  $el('rect',{x:cfg.centerX+9, y:centerTop+9, width:cfg.centerW-18, height:centerH-18, rx:16,
+              fill:'none', stroke:THEME.onBrand, 'stroke-width':2}, svg);
+
+  const tridentG = $el('g',{
+    fill:THEME.gold,
+    transform:`translate(${cfg.centerX + cfg.centerW/2} ${centerMid - 150}) scale(2.1) translate(-12 -16)`
+  }, svg);
+  $el('path',{d:'M11 8h2v24h-2z'}, tridentG);
+  $el('path',{d:'M4 12h16v2H4z'}, tridentG);
+  $el('path',{d:'M3 5h2v9H3zM19 5h2v9h-2z'}, tridentG);
+  $el('path',{d:'M12 1l3.2 7H8.8z'}, tridentG);
+
+  const cx = cfg.centerX + cfg.centerW/2;
+  txt(svg, cx, centerMid - 44, 'Government', {size:30, weight:800, fill:THEME.onBrand, anchor:'middle'});
+  txt(svg, cx, centerMid - 8,  'Spending',   {size:30, weight:800, fill:THEME.onBrand, anchor:'middle'});
+  // The block is drawn at the size of the envelope (all money flowing through),
+  // so it must be labelled with the envelope, not with spending alone — in a
+  // surplus year the two differ by exactly the surplus.
+  txt(svg, cx, centerMid + 48, moneyUnit(envelope), {size:38, weight:900, fill:THEME.gold, anchor:'middle'});
+  txt(svg, cx, centerMid + 78, 'Total budget envelope', {size:15, weight:600, fill:THEME.onBrandSoft, anchor:'middle'});
+
+  const resultLine = net >= 0
+    ? `Includes surplus of ${moneyUnit(net)}`
+    : `Includes deficit financing of ${moneyUnit(Math.abs(net))}`;
+  wrapText(resultLine, cfg.centerW - 44, 14, 700, 2).forEach((lineText, idx)=>{
+    txt(svg, cx, centerMid + 112 + idx*18, lineText,
+        {size:14, weight:700, fill: net >= 0 ? THEME.onBrandGood : THEME.onBrandBad, anchor:'middle'});
+  });
+
+  // ---- node bars ----
+  for(const [i,item] of left.entries()){
+    const g = flows.find(f=>f.side==='in' && f.item===item).g;
+    $el('rect',{x:cfg.leftBarX, y:item.y, width:cfg.barW, height:item.h,
+                rx:Math.min(5, item.h/2), fill:item.tone.bar, opacity:.95}, g);
+  }
+  for(const item of right){
+    const g = flows.find(f=>f.side==='out' && f.item===item).g;
+    $el('rect',{x:cfg.rightBarX, y:item.y, width:cfg.barW, height:item.h,
+                rx:Math.min(5, item.h/2), fill:item.tone.bar, opacity:.95}, g);
+  }
+
+  // ---- labels (outside the bars, so they never overflow a small node) ----
+  for(const item of left.concat(right)) item.labelY = item.cy;
+  decollide(left, cfg.chartTop, contentBottom);
+  decollide(right, cfg.chartTop, contentBottom);
+
+  function drawLabels(items, anchorX, anchor, barX, barEdgeX){
+    for(const item of items){
+      const g = flows.find(f=>f.item===item).g;
+      const top = item.labelY - item.labelH/2;
+
+      item.lines.forEach((lineText, idx)=>{
+        txt(g, anchorX, top + cfg.labelLine*(idx+1) - 4, lineText,
+            {size:LABEL_SIZE, weight:LABEL_WEIGHT, fill:item.tone.label, anchor});
+      });
+      txt(g, anchorX, top + cfg.labelLine*item.lines.length + VALUE_SIZE, money(item.node.value),
+          {size:VALUE_SIZE, weight:VALUE_WEIGHT, fill:item.tone.value, anchor});
+
+      // Leader line whenever de-collision moved the label off its bar.
+      if(Math.abs(item.labelY - item.cy) > cfg.leaderThreshold){
+        $el('path',{
+          d:`M ${barEdgeX} ${item.cy} L ${(barEdgeX + anchorX)/2} ${item.cy} L ${(barEdgeX + anchorX)/2} ${item.labelY} L ${anchorX} ${item.labelY}`,
+          fill:'none', stroke:item.tone.ribbon, 'stroke-width':1, opacity:.55
+        }, g);
+      }
+    }
+  }
+  drawLabels(left, cfg.leftLabelRight, 'end', cfg.leftBarX, cfg.leftBarX - 8);
+  drawLabels(right, cfg.rightLabelX, 'start', cfg.rightBarX, cfg.rightBarX + cfg.barW + 8);
+
+  // ---- footer ----
+  const ruleY = contentBottom + cfg.footerGap;
+  $el('line',{x1:cfg.headerLeftX, y1:ruleY, x2:cfg.rightLabelRight, y2:ruleY,
+              stroke:THEME.rule, 'stroke-width':1}, svg);
+  txt(svg, cfg.headerLeftX, ruleY + 22, data.meta.source, {size:12, weight:700, fill:THEME.muted});
+  txt(svg, cfg.headerLeftX, ruleY + 42, data.meta.sourceNote, {size:12, weight:500, fill:THEME.muted});
+
+  // ---- result marker ----
+  const isSurplus = net >= 0;
+  const markerW = 320, markerH = 30;
+  const markerX = cfg.rightLabelRight - markerW;
+  $el('rect',{x:markerX, y:ruleY + 14, width:markerW, height:markerH, rx:8,
+              fill: isSurplus ? THEME.softGreen : THEME.softRed,
+              stroke: isSurplus ? THEME.surplusBorder : THEME.deficitBorder, 'stroke-width':1}, svg);
+  txt(svg, markerX + markerW/2, ruleY + 34,
+      `${isSurplus ? 'SURPLUS' : 'DEFICIT'}: ${moneyUnit(Math.abs(net))}`,
+      {size:16, weight:900, fill: isSurplus ? THEME.surplus : THEME.deficit, anchor:'middle'});
+
+  // The hidden text node used for measurement has served its purpose.
+  if(measureNode){ measureNode.remove(); measureNode = null; }
+
+  attachInteractions(model, flows);
+}
+
+/* ------------------------- interactions ------------------------- */
+
+function attachInteractions(model, flows){
+  const inTotal = model.envelope;
+  const outTotal = model.envelope;
+
+  function show(evt, flow){
+    const {node} = flow.item;
+    const total = flow.side === 'in' ? inTotal : outTotal;
+
+    tooltipEl.replaceChildren();
+    const label = document.createElement('span');
+    label.className = 't-label';
+    label.textContent = node.label;
+    const value = document.createElement('span');
+    value.className = 't-value';
+    value.textContent = `${moneyUnit(node.value)} · ${pct(node.value, total)} of the budget`;
+    tooltipEl.append(label, value);
+    if(node.note){
+      const note = document.createElement('span');
+      note.className = 't-note';
+      note.textContent = node.note;
+      tooltipEl.appendChild(note);
+    }
+
+    const box = wrapEl.getBoundingClientRect();
+    tooltipEl.style.left = (evt.clientX - box.left) + 'px';
+    tooltipEl.style.top = (evt.clientY - box.top - 14) + 'px';
+    tooltipEl.classList.add('is-visible');
+
+    svg.classList.add('is-hovering');
+    for(const f of flows) f.g.classList.toggle('is-active', f === flow);
+  }
+
+  function hide(){
+    tooltipEl.classList.remove('is-visible');
+    svg.classList.remove('is-hovering');
+    for(const f of flows) f.g.classList.remove('is-active');
+  }
+
+  for(const flow of flows){
+    flow.g.addEventListener('pointermove', e=>show(e, flow));
+    flow.g.addEventListener('pointerleave', hide);
+    flow.g.addEventListener('pointercancel', hide);
+  }
+  wrapEl.addEventListener('pointerleave', hide);
+}
+
+/* --------------------- accessible data table --------------------- */
+
+function drawTable(model){
+  const {data, totalRevenue, totalSpending, net} = model;
+  const unit = data.meta.unit;
+
+  const rows = [];
+  rows.push(['Revenue', '', '']);
+  for(const r of model.data.revenue) rows.push([r.label, money(r.value), r.note]);
+  rows.push(['Total revenue', money(totalRevenue), '']);
+  rows.push(['Spending', '', '']);
+  for(const s of model.data.spending) rows.push([s.label, money(s.value), s.note]);
+  rows.push(['Total spending', money(totalSpending), '']);
+  rows.push([net >= 0 ? 'Surplus' : 'Deficit / borrowing need', money(Math.abs(net)),
+             net >= 0 ? 'Revenue exceeded spending' : 'Spending exceeded revenue']);
+
+  const table = document.createElement('table');
+  const caption = document.createElement('caption');
+  caption.textContent = `${data.meta.title} — all figures in ${unit}`;
+  table.appendChild(caption);
+
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  for(const h of ['Category', `Amount (${unit})`, 'Description']){
+    const th = document.createElement('th');
+    th.scope = 'col';
+    th.textContent = h;
+    headRow.appendChild(th);
+  }
+  thead.appendChild(headRow);
+  table.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  for(const [label, value, note] of rows){
+    const tr = document.createElement('tr');
+    const th = document.createElement('th');
+    th.scope = 'row';
+    th.textContent = label;
+    tr.appendChild(th);
+    for(const cell of [value, note]){
+      const td = document.createElement('td');
+      td.textContent = cell;
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  table.appendChild(tbody);
+
+  tableEl.replaceChildren(table);
+}
+
+/* ------------------------------ init ------------------------------ */
+
+function applyMeta(meta){
+  document.title = meta.title;
+  document.getElementById('pageTitle').textContent = meta.title;
+  document.getElementById('pageSubtitle').textContent = meta.subtitle;
+  document.getElementById('legendDeficit').style.color = THEME.deficit;
+  document.getElementById('legendSurplus').style.color = THEME.surplus;
+
+  const symbol = meta.currencySymbol ?? '';
+  const short = meta.unitShort ?? '';
+  moneyUnit = v => `${symbol}${money(v)}${short}`;
+}
+
+async function init(){
+  const {data, source} = await loadData();
+  applyMeta(data.meta);
+
+  const model = buildModel(data);
+  drawSummary(model);
+  drawChart(model);
+  drawTable(model);
+
+  if(source === 'embedded'){
+    const note = document.getElementById('editNote');
+    note.classList.add('is-warning');
+    note.insertAdjacentHTML('beforeend',
+      ' <strong>Currently showing the embedded fallback data</strong> — <code>data.json</code> could not be loaded.');
+  }
+}
+
+init();
 </script>
 </body>
 </html>
