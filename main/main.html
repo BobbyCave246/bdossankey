@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Barbados Budget – Citizen View Sankey</title>
+<style>
+  :root{
+    --bg:#f5f7fa;
+    --panel:#ffffff;
+    --text:#16202a;
+    --muted:#62707d;
+    --border:#dbe2e8;
+
+    --barbados-blue:#0b2f6b;
+    --barbados-gold:#f2b632;
+
+    --revenue:#8f99a4;
+    --revenue-dark:#6f7781;
+    --spend:#2e6bb6;
+    --spend-light:#dce9f8;
+    --deficit:#c23b3b;
+    --surplus:#1f8f4d;
+    --soft-red:#fbe7e7;
+    --soft-green:#e5f6ea;
+    --soft-gray:#eef2f5;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter, Arial, Helvetica, sans-serif;
+  }
+
+  .page{
+    max-width:1600px;
+    margin:24px auto;
+    background:var(--panel);
+    padding:28px 30px 24px;
+    box-shadow:0 10px 36px rgba(0,0,0,.08);
+    border-radius:12px;
+  }
+
+  .title-row{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:20px;
+  }
+
+  .flag{
+    width:72px;
+    height:48px;
+    display:grid;
+    grid-template-columns:1fr 1fr 1fr;
+    overflow:hidden;
+    border-radius:4px;
+    box-shadow:0 0 0 1px rgba(0,0,0,.08);
+    flex:0 0 auto;
+  }
+  .flag .b{background:#00267f}
+  .flag .y{background:#ffc726; position:relative}
+  .flag .y::after{
+    content:"♆";
+    position:absolute;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-52%) rotate(180deg);
+    font-size:30px;
+    color:#111;
+    font-family:Georgia, serif;
+  }
+
+  h1{
+    margin:0;
+    text-align:center;
+    color:var(--barbados-blue);
+    line-height:1.05;
+    font-size:42px;
+    letter-spacing:-1px;
+  }
+  .subtitle{
+    margin-top:8px;
+    text-align:center;
+    font-size:21px;
+    font-weight:700;
+    color:#26303a;
+  }
+  .subnote{
+    text-align:center;
+    margin-top:6px;
+    color:var(--muted);
+    font-size:13px;
+  }
+
+  .summary{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:14px;
+    margin:18px 0 18px;
+  }
+  .card{
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:14px 16px;
+    background:#fff;
+  }
+  .card .k{
+    font-size:12px;
+    font-weight:800;
+    color:#5a6672;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    margin-bottom:6px;
+  }
+  .card .v{
+    font-size:30px;
+    font-weight:900;
+    line-height:1;
+  }
+  .card .s{
+    margin-top:6px;
+    font-size:13px;
+    color:#607080;
+  }
+  .card.revenue{background:var(--soft-gray)}
+  .card.revenue .v{color:#434c56}
+  .card.spending{background:#eef5fd}
+  .card.spending .v{color:#194f95}
+  .card.result.negative{background:var(--soft-red); border-color:#efcaca}
+  .card.result.negative .v{color:var(--deficit)}
+  .card.result.positive{background:var(--soft-green); border-color:#cbe7d4}
+  .card.result.positive .v{color:var(--surplus)}
+  .card.message{
+    background:#f8fafc;
+  }
+  .card.message .v{
+    font-size:18px;
+    font-weight:800;
+    color:#1f2a35;
+    line-height:1.25;
+  }
+
+  #sankeyWrap{
+    width:100%;
+    min-height:760px;
+    position:relative;
+  }
+  svg{
+    display:block;
+    width:100%;
+    height:auto;
+  }
+
+  .panel-title{
+    fill:#fff;
+    font-size:18px;
+    font-weight:800;
+    letter-spacing:.4px;
+  }
+  .label{
+    font-size:18px;
+    font-weight:700;
+  }
+  .value{
+    font-size:26px;
+    font-weight:900;
+  }
+  .tiny{
+    font-size:11px;
+    fill:#67727f;
+  }
+
+  .legend-row{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:14px;
+  }
+  .legend-box{
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px;
+    background:#fff;
+  }
+  .legend-box h3{
+    margin:0 0 10px;
+    font-size:16px;
+    color:#172432;
+  }
+  .legend-box p{
+    margin:7px 0;
+    font-size:13px;
+    color:#4d5b68;
+    line-height:1.45;
+  }
+
+  .edit-note{
+    margin-top:16px;
+    padding:12px 14px;
+    border-radius:12px;
+    background:#f7f9fb;
+    border:1px solid #e1e7ec;
+    color:#43505d;
+    font-size:13px;
+  }
+
+  code{
+    background:#eef3f7;
+    padding:1px 5px;
+    border-radius:4px;
+  }
+
+  @media (max-width:1100px){
+    .summary{grid-template-columns:1fr 1fr}
+    .legend-row{grid-template-columns:1fr}
+    h1{font-size:32px}
+    .subtitle{font-size:18px}
+  }
+  @media (max-width:760px){
+    .page{padding:16px}
+    .summary{grid-template-columns:1fr}
+    .flag{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="title-row">
+    <div class="flag"><div class="b"></div><div class="y"></div><div class="b"></div></div>
+    <div>
+      <h1>Barbados Budget – What Citizens Pay &amp; What They Get</h1>
+      <div class="subtitle">Citizen view of government revenue and spending • FY2025/26 revised estimates • BDS$ millions</div>
+      <div class="subnote">Incoming money is shown in grey. Fiscal result automatically turns green for surplus or red for deficit.</div>
+    </div>
+    <div class="flag"><div class="b"></div><div class="y"></div><div class="b"></div></div>
+  </div>
+
+  <div id="summary" class="summary"></div>
+
+  <div id="sankeyWrap">
+    <svg id="sankey" viewBox="0 0 1500 760" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+
+  <div class="legend-row">
+    <div class="legend-box">
+      <h3>How to read it</h3>
+      <p><strong>Left side:</strong> where government money comes from.</p>
+      <p><strong>Right side:</strong> a <em>citizen-friendly</em> grouping of what that money pays for.</p>
+      <p><strong>Middle:</strong> the full spending envelope for the year.</p>
+    </div>
+    <div class="legend-box">
+      <h3>About the citizen view</h3>
+      <p>The right-hand categories are grouped to be easier for the public to understand: education, healthcare, welfare, infrastructure, security, administration and debt cost.</p>
+      <p>You can edit those groupings if you want a different public-facing story.</p>
+    </div>
+    <div class="legend-box">
+      <h3>Fiscal result</h3>
+      <p>If revenue is less than spending, the chart shows a <strong style="color:#c23b3b">red deficit / borrowing need</strong>.</p>
+      <p>If revenue is greater than spending, it will show a <strong style="color:#1f8f4d">green surplus</strong>.</p>
+    </div>
+  </div>
+
+  <div class="edit-note">
+    <strong>Editing:</strong> search this file for <code>EDIT DATA HERE</code>.  
+    Change any labels, notes or values in the arrays and the chart redraws automatically.
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   EDIT DATA HERE
+   Values are BDS$ millions.
+   Revenue is official FY2025/26 revised mid-year data.
+   Spending on the right is a citizen-view grouping that is
+   deliberately easy to understand and easy to edit.
+   ========================================================= */
+
+const revenueData = [
+  { label:"Income & profits",          value:1379.13, color:"#8f99a4", note:"Personal and company taxes" },
+  { label:"Goods & services",          value:1655.47, color:"#8f99a4", note:"Mainly VAT and similar taxes" },
+  { label:"International trade",       value:285.78,  color:"#8f99a4", note:"Import duties and trade taxes" },
+  { label:"Property",                  value:226.38,  color:"#8f99a4", note:"Land and property taxes" },
+  { label:"Non-tax revenue",           value:194.69,  color:"#8f99a4", note:"Fees, charges and other income" },
+  { label:"Other revenue & grants",    value:123.06,  color:"#8f99a4", note:"Other inflows and grants" }
+];
+
+const citizenSpendData = [
+  { label:"Education & skills",                value:289.80,  color:"#2e6bb6", note:"Schools, training, tertiary support" },
+  { label:"Healthcare & wellness",             value:376.20,  color:"#2e6bb6", note:"Hospitals, clinics, public health" },
+  { label:"Welfare, pensions & social support",value:650.00,  color:"#2e6bb6", note:"Transfers to households and support schemes" },
+  { label:"Roads, water & infrastructure",     value:549.80,  color:"#2e6bb6", note:"Roads, water works, physical infrastructure" },
+  { label:"Police, courts & public safety",    value:280.00,  color:"#2e6bb6", note:"Security, justice and safety" },
+  { label:"Public administration",             value:1041.91, color:"#2e6bb6", note:"Core government operations and services" },
+  { label:"Debt interest",                     value:718.02,  color:"#2e6bb6", note:"The cost of servicing debt" }
+];
+
+/* ========================================================= */
+
+const svg = document.getElementById("sankey");
+const NS = "http://www.w3.org/2000/svg";
+const summary = document.getElementById("summary");
+
+const cfg = {
+  w:1500,
+  h:760,
+  leftX:80,
+  leftW:250,
+  centerX:590,
+  centerW:300,
+  rightX:1095,
+  rightW:320,
+  top:120,
+  leftGap:16,
+  rightGap:16,
+  nodeH:58,
+  nodeHRight:62,
+  ribbonMin:6,
+  ribbonMax:72
+};
+
+function $el(name, attrs={}){
+  const e = document.createElementNS(NS,name);
+  Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));
+  return e;
+}
+function add(node){ svg.appendChild(node); return node; }
+function rect(x,y,w,h,fill,rx=10,stroke='none',sw=1){
+  return add($el('rect',{x,y,width:w,height:h,fill,rx,stroke,'stroke-width':sw}));
+}
+function txt(x,y,content,opts={}){
+  const t = $el('text',{
+    x,y,
+    'font-size':opts.size || 16,
+    'font-weight':opts.weight || 400,
+    fill:opts.fill || '#16202a',
+    'text-anchor':opts.anchor || 'start'
+  });
+  t.textContent = content;
+  return add(t);
+}
+function line(x1,y1,x2,y2,stroke='#d8dee5',sw=1){
+  return add($el('line',{x1,y1,x2,y2,stroke,'stroke-width':sw}));
+}
+function path(d, fill, opacity=.7){
+  return add($el('path',{d,fill,opacity}));
+}
+function money(v){
+  return v.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
+}
+function sum(arr){ return arr.reduce((a,b)=>a+b.value,0); }
+
+const totalRevenue = sum(revenueData);
+const totalSpending = sum(citizenSpendData);
+const net = +(totalRevenue - totalSpending).toFixed(2); // positive = surplus, negative = deficit
+
+function ribbonWidth(value){
+  const max = Math.max(...revenueData.map(d=>d.value), ...citizenSpendData.map(d=>d.value), Math.abs(net));
+  return cfg.ribbonMin + (value/max)*(cfg.ribbonMax-cfg.ribbonMin);
+}
+
+function ribbon(x1,y1,x2,y2,w,color,opacity=.72){
+  const c1 = x1 + 140;
+  const c2 = x2 - 140;
+  const d = [
+    `M ${x1} ${y1-w/2}`,
+    `C ${c1} ${y1-w/2}, ${c2} ${y2-w/2}, ${x2} ${y2-w/2}`,
+    `L ${x2} ${y2+w/2}`,
+    `C ${c2} ${y2+w/2}, ${c1} ${y1+w/2}, ${x1} ${y1+w/2}`,
+    'Z'
+  ].join(' ');
+  path(d,color,opacity);
+}
+
+function drawSummary(){
+  const resultType = net >= 0 ? 'positive' : 'negative';
+  const resultLabel = net >= 0 ? 'SURPLUS' : 'DEFICIT';
+  const resultValue = Math.abs(net);
+
+  summary.innerHTML = `
+    <div class="card revenue">
+      <div class="k">Total revenue</div>
+      <div class="v">${money(totalRevenue)}</div>
+      <div class="s">All regular revenue sources combined</div>
+    </div>
+    <div class="card spending">
+      <div class="k">Total spending</div>
+      <div class="v">${money(totalSpending)}</div>
+      <div class="s">Citizen-view grouped expenditure</div>
+    </div>
+    <div class="card result ${resultType}">
+      <div class="k">Budget result</div>
+      <div class="v">${resultLabel}: ${money(resultValue)}</div>
+      <div class="s">${net >= 0 ? 'More money came in than went out' : 'More money went out than came in'}</div>
+    </div>
+    <div class="card message">
+      <div class="k">Plain-English takeaway</div>
+      <div class="v">${net >= 0 ? 'The country generated a surplus this year.' : 'The country spent more than it collected, so the gap had to be financed.'}</div>
+      <div class="s">Use this box to tell the public what the numbers mean.</div>
+    </div>
+  `;
+}
+
+function draw(){
+  svg.innerHTML = '';
+
+  // Section headers
+  rect(32,68,360,42,'#505861',10);
+  txt(212,95,'WHERE THE MONEY COMES FROM',{size:18,weight:800,fill:'#fff',anchor:'middle'});
+  rect(1048,68,400,42,'#0b2f6b',10);
+  txt(1248,95,'WHAT CITIZENS GET FROM IT',{size:18,weight:800,fill:'#fff',anchor:'middle'});
+
+  // Central block
+  const centerY = 200;
+  const centerH = 340;
+  rect(cfg.centerX, centerY, cfg.centerW, centerH, '#0b2f6b', 20, '#08285b', 3);
+  rect(cfg.centerX+9, centerY+9, cfg.centerW-18, centerH-18, 'none', 16, '#ffffff', 2);
+
+  txt(cfg.centerX + cfg.centerW/2, centerY + 64, '♆', {size:44,weight:700,fill:'#f2b632',anchor:'middle'});
+  txt(cfg.centerX + cfg.centerW/2, centerY + 138, 'Government',{size:30,weight:800,fill:'#fff',anchor:'middle'});
+  txt(cfg.centerX + cfg.centerW/2, centerY + 175, 'Spending',{size:30,weight:800,fill:'#fff',anchor:'middle'});
+  txt(cfg.centerX + cfg.centerW/2, centerY + 238, money(totalSpending),{size:42,weight:900,fill:'#f2b632',anchor:'middle'});
+  txt(cfg.centerX + cfg.centerW/2, centerY + 270, 'Total budget envelope',{size:15,weight:600,fill:'#dfe9f8',anchor:'middle'});
+  txt(cfg.centerX + cfg.centerW/2, centerY + 305, net >= 0 ? `Includes surplus of ${money(net)}` : `Includes deficit financing of ${money(Math.abs(net))}`, {size:14,weight:700,fill: net >=0 ? '#9fe0b6' : '#ffc7c7',anchor:'middle'});
+
+  // Left side revenue nodes
+  let leftY = 115;
+  const inflowColor = '#8f99a4';
+  revenueData.forEach((d, i) => {
+    const cy = leftY + cfg.nodeH/2;
+    const targetY = centerY + 76 + i*32;
+    ribbon(cfg.leftX + cfg.leftW, cy, cfg.centerX, targetY, ribbonWidth(d.value), d.color, .76);
+
+    rect(cfg.leftX, leftY, cfg.leftW, cfg.nodeH, '#eef2f5', 10, '#cfd7df', 1.3);
+    txt(cfg.leftX + 16, leftY + 23, d.label, {size:18, weight:800, fill:'#303741'});
+    txt(cfg.leftX + 16, leftY + 49, money(d.value), {size:25, weight:900, fill:'#4d5660'});
+    txt(cfg.leftX + cfg.leftW + 12, leftY + 36, d.note, {size:11, weight:500, fill:'#66717d'});
+    leftY += cfg.nodeH + cfg.leftGap;
+  });
+
+  // Deficit financing OR surplus
+  if(net < 0){
+    const val = Math.abs(net);
+    const y = leftY + 12;
+    const cy = y + cfg.nodeH/2;
+    ribbon(cfg.leftX + cfg.leftW, cy, cfg.centerX, centerY + 270, ribbonWidth(val), '#c23b3b', .78);
+    rect(cfg.leftX, y, cfg.leftW, cfg.nodeH, '#fbe7e7', 10, '#efb3b3', 1.4);
+    txt(cfg.leftX + 16, y + 23, 'Deficit / borrowing need', {size:17,weight:800,fill:'#922e2e'});
+    txt(cfg.leftX + 16, y + 49, money(val), {size:24,weight:900,fill:'#c23b3b'});
+    txt(cfg.leftX + cfg.leftW + 12, y + 36, 'Spending exceeded revenue', {size:11,weight:600,fill:'#a03a3a'});
+  }
+
+  // Right side spending nodes
+  let rightY = 108;
+  citizenSpendData.forEach((d, i) => {
+    const cy = rightY + cfg.nodeHRight/2;
+    const sourceY = centerY + 78 + i*37;
+    ribbon(cfg.centerX + cfg.centerW, sourceY, cfg.rightX, cy, ribbonWidth(d.value), d.color, .72);
+
+    const fill = d.label === 'Debt interest' ? '#f7ebeb' : '#eaf2fc';
+    const stroke = d.label === 'Debt interest' ? '#d6a3a3' : '#b9d0ee';
+    const valueFill = d.label === 'Debt interest' ? '#a43131' : '#194f95';
+
+    rect(cfg.rightX, rightY, cfg.rightW, cfg.nodeHRight, fill, 10, stroke, 1.4);
+    txt(cfg.rightX + 16, rightY + 22, d.label, {size:17,weight:800,fill:'#172534'});
+    txt(cfg.rightX + 16, rightY + 48, money(d.value), {size:25,weight:900,fill:valueFill});
+    txt(cfg.rightX + 16, rightY + 62, d.note, {size:10.5,weight:500,fill:'#62707d'});
+    rightY += cfg.nodeHRight + cfg.rightGap;
+  });
+
+  // Footer lines / explanations within svg
+  line(30, 720, 1470, 720, '#d7dde4', 1);
+  txt(34, 740, 'Source: Barbados Parliament Mid-Year Review Report FY2025/26.', {size:12,weight:700,fill:'#45515d'});
+  txt(370, 740, 'Revenue values are official revised estimates. Right-hand categories are a citizen-view grouping for communication and are fully editable.', {size:12,weight:500,fill:'#5f6d7a'});
+
+  // Net result marker
+  if(net >= 0){
+    rect(1110, 674, 310, 30, '#e5f6ea', 8, '#b8ddc4', 1);
+    txt(1265, 694, `SURPLUS: ${money(net)}`, {size:16,weight:900,fill:'#1f8f4d',anchor:'middle'});
+  } else {
+    rect(1110, 674, 310, 30, '#fbe7e7', 8, '#efc0c0', 1);
+    txt(1265, 694, `DEFICIT: ${money(Math.abs(net))}`, {size:16,weight:900,fill:'#c23b3b',anchor:'middle'});
+  }
+}
+
+drawSummary();
+draw();
+</script>
+</body>
+</html>
