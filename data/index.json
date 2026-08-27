@@ -1,0 +1,15 @@
+{
+  "default": "2025-26",
+  "years": [
+    {
+      "id": "2025-26",
+      "label": "FY2025/26 \u00b7 Approved Estimates",
+      "file": "data/2025-26.json"
+    },
+    {
+      "id": "2026-27",
+      "label": "FY2026/27 \u00b7 Draft Revised Estimates",
+      "file": "data/2026-27.json"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "meta": {
+    "title": "Barbados Budget \u2013 What Citizens Pay & What They Get",
+    "subtitle": "Citizen view of government revenue and spending \u2022 FY2026/27 Draft Revised Estimates \u2022 BDS$ millions",
+    "unit": "BDS$ millions",
+    "unitShort": "M",
+    "unitPerPerson": "BDS$ per resident, per year",
+    "currencySymbol": "$",
+    "source": "Source: Barbados Draft Revised Estimates of Revenue and Expenditure 2026-2027.",
+    "sourceNote": "Draft Revised Estimates of Revenue and Expenditure 2026-2027, approved by Cabinet and laid in the House of Assembly in March 2026. These are draft figures and may change.",
+    "basisNote": "Spending is grouped by the official functional classification (Table 5) and excludes debt amortisation of BDS$781.76m, which repays principal and is a financing item rather than a service. Total expenditure including amortisation is BDS$5,875.12m, the figure printed on the cover of the Estimates.",
+    "population": {
+      "value": 261692,
+      "year": 2025,
+      "label": "Barbados Statistical Service, end-2025"
+    },
+    "highlights": {
+      "debtId": "debt",
+      "compareIds": [
+        "education",
+        "healthcare"
+      ]
+    },
+    "sources": [
+      {
+        "label": "Barbados Draft Revised Estimates of Revenue and Expenditure 2026-2027",
+        "url": "sources/barbados-estimates-2026-2027-draft-revised.pdf",
+        "supports": "Every revenue and spending figure on this page",
+        "verified": true
+      },
+      {
+        "label": "Barbados Statistical Service",
+        "url": "https://stats.gov.bb/statistics/",
+        "supports": "Population used for per-resident figures",
+        "verified": false
+      }
+    ],
+    "reconciliation": {
+      "revenueTotal": 5075.89,
+      "expenditureTotalIncludingAmortisation": 5875.12,
+      "amortisationExcluded": 781.76,
+      "expenditureShown": 5093.35
+    }
+  },
+  "revenue": [
+    {
+      "id": "income-profits",
+      "label": "Income & profits",
+      "value": 2430.49,
+      "note": "Personal and company taxes"
+    },
+    {
+      "id": "goods-services",
+      "label": "Goods & services",
+      "value": 1767.12,
+      "note": "Mainly VAT and similar taxes"
+    },
+    {
+      "id": "trade",
+      "label": "International trade",
+      "value": 319.15,
+      "note": "Import duties and trade taxes"
+    },
+    {
+      "id": "property",
+      "label": "Property",
+      "value": 235.49,
+      "note": "Land and property taxes"
+    },
+    {
+      "id": "other-taxes",
+      "label": "Other taxes",
+      "value": 18.91,
+      "note": "Remaining tax lines"
+    },
+    {
+      "id": "non-tax",
+      "label": "Non-tax revenue",
+      "value": 304.71,
+      "note": "Fees, charges, levies and grants"
+    }
+  ],
+  "spending": [
+    {
+      "id": "education",
+      "label": "Education & skills",
+      "value": 811.14,
+      "note": "Schools, training and tertiary support",
+      "from": [
+        "Education"
+      ]
+    },
+    {
+      "id": "healthcare",
+      "label": "Healthcare",
+      "value": 485.76,
+      "note": "Hospitals, clinics and public health",
+      "from": [
+        "Health"
+      ]
+    },
+    {
+      "id": "welfare",
+      "label": "Welfare & social protection",
+      "value": 179.22,
+      "note": "Pensions, transfers and support schemes",
+      "from": [
+        "Social Protection"
+      ]
+    },
+    {
+      "id": "infrastructure",
+      "label": "Housing, water & environment",
+      "value": 510.73,
+      "note": "Housing, water works and environmental protection",
+      "from": [
+        "Housing and Community Amenities",
+        "Environmental Protection"
+      ]
+    },
+    {
+      "id": "economy",
+      "label": "Roads, transport & the economy",
+      "value": 484.36,
+      "note": "Transport, agriculture, tourism and industry",
+      "from": [
+        "Economic Affairs"
+      ]
+    },
+    {
+      "id": "safety",
+      "label": "Police, courts & defence",
+      "value": 471.71,
+      "note": "Policing, justice, prisons and defence",
+      "from": [
+        "Public Order And Safety",
+        "Defense"
+      ]
+    },
+    {
+      "id": "community",
+      "label": "Sport, culture & community",
+      "value": 134.33,
+      "note": "Sport, culture, religion and broadcasting",
+      "from": [
+        "Recreation, Culture and Religion"
+      ]
+    },
+    {
+      "id": "administration",
+      "label": "Running the government",
+      "value": 1289.96,
+      "note": "Core government operations, excluding debt service",
+      "from": [
+        "General Public Services less debt service"
+      ]
+    },
+    {
+      "id": "debt",
+      "label": "Debt interest",
+      "value": 726.15,
+      "tone": "debt",
+      "note": "Interest and loan expenses; repayment of principal is excluded",
+      "from": [
+        "Interest Expense",
+        "Expenses of Loans"
+      ]
+    }
+  ]
+}
