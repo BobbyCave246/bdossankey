@@ -154,18 +154,78 @@ Below programme level the books name individual institutions — Health's
 sub-programmes list polyclinics one by one, for example. A drill-down to that
 depth is buildable.
 
-**What it needs first:** a head → function mapping. Health is clean (Head 86 =
-379,464,695 = the Health function exactly), and education is two heads plus a
-2.00m residual, so the mapping is close to one-to-one but not exactly. It has to
-be derived head by head and then verified by checking that each function's heads
-sum to that function's published total — the same standard as the rest of the
-build. It is tractable but it is not done, and no head-level figures are used by
-the chart today.
+**What it needed first was a head → function mapping. There isn't one.**
+`tools/build_heads.py` now extracts every head and programme from both books,
+reconciles them against the printed totals, and tests the mapping question
+directly. The test is exhaustive rather than argumentative: for each of the ten
+functional categories it asks whether *any* subset of the head totals sums to
+that category's published Table 5 total.
 
-One extraction obstacle to be aware of: on head pages where all six year columns
-are populated, adjacent columns can merge into a single token
-(`415,891,980379,464,695`), so a head-level parser needs character-level column
-splitting rather than whitespace tokens.
+```
+pip install pdfplumber
+python3 tools/build_heads.py
+```
+
+| | FY2025/26 | FY2026/27 |
+| --- | --- | --- |
+| Functions reproducible from whole heads | 1 of 10 — Health | 2 of 10 — Health, Education |
+| Functions no combination of heads can reach | 9 | 8 |
+
+Health is Head 86 exactly in both years, and in FY2026/27 education is exactly
+Heads 63 + 96. Everything else is unreachable: no assignment of whole ministries
+to functions, however drawn, reproduces the published totals. Two examples make
+the reason concrete.
+
+- **Social Protection, FY2025/26, is 83,456,409** — smaller than programme 423
+  *Personal Social Services* (93,928,762) inside Head 35 alone, the single
+  programme most obviously belonging to it.
+- **Defense is 89,985,688**, while the only programme in either book named for
+  defence — Head 13's programme 041, *National Defence and Security* — is
+  94,845,688. It is 4,860,000 too large to be assigned whole.
+
+So the government applies the functional classification below head level, and in
+places below programme level. The books never publish the crosswalk: "functional"
+appears in both documents only at Table 5 itself. That is why no head-level
+drill-down is published and why the chart still shows only the Table 5 figures.
+
+The **2.00m education residual is real and specific to the 2025-26 book.**
+Heads 95 + 96 are 736,969,536 against an Education function of 738,969,220 — a
+residual of 1,999,684 classified to education from outside those two ministries.
+The same arithmetic in the 2026-27 book closes exactly, so this is not a
+structural feature of the classification.
+
+### What the extraction verifies
+
+Both books, or the build exits non-zero:
+
+1. Table 5's ten functions sum to total expenditure.
+2. Every head's programme rows sum to that head's own printed `Total Head` line.
+3. All head totals sum to total expenditure, to a declared residual.
+4. Each head total is corroborated against Table 7's independent grand-total
+   column (27 of 27 heads for FY2025/26; 23 of 28 for the draft).
+
+Discrepancies in the books themselves are declared with their exact amounts in
+`BOOKS`, so a *new* one still fails the build rather than being absorbed:
+
+| Book | What the document does | Amount |
+| --- | --- | --- |
+| 2025-26 | Head 40's summary table omits programme 511, Drainage Services | 8,996,878 |
+| 2025-26 | Head pages round against Table 7 and the cover page | ≤ $3 in total |
+| 2026-27 | Head 39's page exceeds the Table 7 figure that sums to the cover | 4,082,639 |
+| 2026-27 | Head 19's programme rows fall short of its own printed total | 50,615,647 |
+| 2026-27 | Heads 14, 32, 40, 41, 63, 96 likewise | $196 to 999,999 |
+| 2026-27 | The Office of the President's page is printed twice, identically | — |
+
+The draft book is visibly less finished than the approved one, which is worth
+remembering when reading its figures.
+
+One extraction obstacle, now handled: on head pages where all six year columns
+are populated, adjacent columns merge into a single token
+(`415,891,980379,464,695`). The parser cuts columns midway between the six `$`
+signs printed under the year headings — the one landmark on every head page,
+since the year headings themselves wrap onto two lines in places — and reads
+values character by character, so colliding figures are split on position rather
+than on whitespace.
 
 ## Still open
 

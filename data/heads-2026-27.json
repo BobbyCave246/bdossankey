@@ -1,0 +1,996 @@
+{
+  "meta": {
+    "year": "2026-27",
+    "source": "sources/barbados-estimates-2026-2027-draft-revised.pdf",
+    "unit": "BDS$",
+    "totalExpenditure": 5875116133,
+    "excludedHeads": [
+      50
+    ],
+    "note": "Head and programme figures read from each head's own summary table and reconciled against the printed totals. The books do not publish a head-to-function crosswalk. headToFunction holds the mappings that could be derived and verified against Table 5; unmappableFunctions holds the functions no combination of whole heads can reproduce, which is why no drill-down is built on this data yet.",
+    "headToFunction": {
+      "Health": [
+        86
+      ],
+      "Education": [
+        63,
+        96
+      ]
+    },
+    "unmappableFunctions": [
+      "General Public Services",
+      "Defense",
+      "Public Order And Safety",
+      "Economic Affairs",
+      "Environmental Protection",
+      "Housing and Community Amenities",
+      "Recreation, Culture and Religion",
+      "Social Protection"
+    ],
+    "ambiguousFunctions": [],
+    "reconciliationNotes": [
+      "Head 10: its page is printed twice (pages 68 and 73), identically",
+      "Head 14: programmes sum -400 against its printed 'Total Head' of 781,535,939",
+      "Head 19: programmes sum -50,615,647 against its printed 'Total Head' of 1,653,642,580",
+      "Head 32: programmes sum +900,000 against its printed 'Total Head' of 87,961,474",
+      "Head 40: programmes sum -930,263 against its printed 'Total Head' of 186,137,617",
+      "Head 41: programmes sum -196 against its printed 'Total Head' of 87,951,778",
+      "Head 63: programmes sum +999,999 against its printed 'Total Head' of 285,919,602",
+      "Head 96: programmes sum +749,995 against its printed 'Total Head' of 525,222,123"
+    ]
+  },
+  "functions": {
+    "General Public Services": 2797872713,
+    "Defense": 141855714,
+    "Public Order And Safety": 329849541,
+    "Economic Affairs": 484363047,
+    "Environmental Protection": 167172572,
+    "Housing and Community Amenities": 343561106,
+    "Health": 485755980,
+    "Recreation, Culture and Religion": 134328657,
+    "Education": 811141725,
+    "Social Protection": 179215078
+  },
+  "heads": {
+    "10": {
+      "page": 68,
+      "total": 3551044,
+      "programmes": [
+        {
+          "code": "001",
+          "name": "OFFICE OF THE PRESIDENT",
+          "value": 3551044
+        }
+      ],
+      "programmeSum": 3551044
+    },
+    "12": {
+      "page": 75,
+      "total": 17190950,
+      "programmes": [
+        {
+          "code": "030",
+          "name": "PARLIAMENT",
+          "value": 17190950
+        }
+      ],
+      "programmeSum": 17190950
+    },
+    "13": {
+      "page": 84,
+      "total": 380226814,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION&POLICY FORMULATION",
+          "value": 26866010
+        },
+        {
+          "code": "041",
+          "name": "NATIONAL DEFENCE & SECURITY",
+          "value": 148132058
+        },
+        {
+          "code": "045",
+          "name": "NATIONAL TRANSFORMATION",
+          "value": 0
+        },
+        {
+          "code": "166",
+          "name": "RURAL DEVELOPMENT",
+          "value": 0
+        },
+        {
+          "code": "121",
+          "name": "ECONOMIC AND SOCIAL PLANNING",
+          "value": 10417838
+        },
+        {
+          "code": "276",
+          "name": "CULTURE",
+          "value": 51784888
+        },
+        {
+          "code": "277",
+          "name": "YOUTH AFFAIRS AND SPORTS",
+          "value": 30542699
+        },
+        {
+          "code": "365",
+          "name": "HIV/AIDS PREVENTION AND CONTROL",
+          "value": 90000
+        },
+        {
+          "code": "366",
+          "name": "NATIONAL CRISIS MANAGEMENT",
+          "value": 4000000
+        },
+        {
+          "code": "425",
+          "name": "PROMOTION OF SPORTSACHIEVEMNTS",
+          "value": 0
+        },
+        {
+          "code": "518",
+          "name": "BARBADOS WATER AUTHORITY",
+          "value": 80466849
+        },
+        {
+          "code": "631",
+          "name": "URBAN DEVELOPMENT",
+          "value": 0
+        },
+        {
+          "code": "636",
+          "name": "URBAN AND RURAL DEVELOPMENT",
+          "value": 26026472
+        },
+        {
+          "code": "650",
+          "name": "PRESERVATION & CONSERVATION",
+          "value": 1900000
+        }
+      ],
+      "programmeSum": 380226814
+    },
+    "14": {
+      "page": 139,
+      "total": 781535939,
+      "programmes": [
+        {
+          "code": "002",
+          "name": "FINANCIAL CONTROL & TREASURY",
+          "value": 21630877
+        },
+        {
+          "code": "040",
+          "name": "DIRECTION&POLICY FORMULATION",
+          "value": 244515562
+        },
+        {
+          "code": "110",
+          "name": "BUDGET AND PUBLIC EXPENDITURE",
+          "value": 6501139
+        },
+        {
+          "code": "113",
+          "name": "REVENUE COLLECTION",
+          "value": 70836224
+        },
+        {
+          "code": "116",
+          "name": "SUPPLIES AND PURCHASING",
+          "value": 3499221
+        },
+        {
+          "code": "117",
+          "name": "PENSIONS",
+          "value": 433827516
+        },
+        {
+          "code": "119",
+          "name": "LENDING",
+          "value": 725000
+        }
+      ],
+      "programmeSum": 781535539,
+      "programmeGap": -400
+    },
+    "15": {
+      "page": 173,
+      "total": 42559241,
+      "programmes": [
+        {
+          "code": "020",
+          "name": "JUDICIARY",
+          "value": 10233475
+        },
+        {
+          "code": "070",
+          "name": "CABINET SECRETARIAT",
+          "value": 19854348
+        },
+        {
+          "code": "071",
+          "name": "CONSTITUTIONAL AND STATUTORY",
+          "value": 9657613
+        },
+        {
+          "code": "072",
+          "name": "OFFICE OF THE HEAD OF THE PUBLIC",
+          "value": 2813805
+        }
+      ],
+      "programmeSum": 42559241
+    },
+    "17": {
+      "page": 189,
+      "total": 1173595,
+      "programmes": [
+        {
+          "code": "090",
+          "name": "INVESTIGATION OF COMPLAINTS AGAINS",
+          "value": 1173595
+        }
+      ],
+      "programmeSum": 1173595
+    },
+    "18": {
+      "page": 196,
+      "total": 5983141,
+      "programmes": [
+        {
+          "code": "100",
+          "name": "AUDIT",
+          "value": 5983141
+        }
+      ],
+      "programmeSum": 5983141
+    },
+    "19": {
+      "page": 756,
+      "total": 1653642580,
+      "programmes": [
+        {
+          "code": "109",
+          "name": "ASSET MGMT",
+          "value": 54000000
+        },
+        {
+          "code": "111",
+          "name": "DEBT MGMT",
+          "value": 1549026933
+        },
+        {
+          "code": "112",
+          "name": "FINANCIAL CONTROL & TREASURY",
+          "value": 0
+        },
+        {
+          "code": "118",
+          "name": "CAPITAL INVESTMENT, CONTRIBUTIONS",
+          "value": 0
+        }
+      ],
+      "programmeSum": 1603026933,
+      "programmeGap": -50615647
+    },
+    "20": {
+      "page": 203,
+      "total": 19066998,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 1102535
+        },
+        {
+          "code": "050",
+          "name": "PUBLIC SERVICE",
+          "value": 8130001
+        },
+        {
+          "code": "080",
+          "name": "DVLPMT OF MANAGERIAL &PERS.",
+          "value": 3637523
+        },
+        {
+          "code": "082",
+          "name": "IMPLMT OF PERS. CONDITION OF SERV.",
+          "value": 6196939
+        }
+      ],
+      "programmeSum": 19066998
+    },
+    "27": {
+      "page": 217,
+      "total": 38688898,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 5323799
+        },
+        {
+          "code": "332",
+          "name": "DEVELOPMENT OF TOURISM POTENTIAL",
+          "value": 982000
+        },
+        {
+          "code": "333",
+          "name": "INTERNATIONAL TRANSPORT",
+          "value": 3449473
+        },
+        {
+          "code": "334",
+          "name": "REGULATION OF AIR SERVICES",
+          "value": 7949676
+        },
+        {
+          "code": "335",
+          "name": "AIR TRANSPORT INFRASTRUCTURE",
+          "value": 17516646
+        },
+        {
+          "code": "336",
+          "name": "DEVELOPMENT OF MARITIME",
+          "value": 2306468
+        },
+        {
+          "code": "340",
+          "name": "AVIATION SERVICES",
+          "value": 1160836
+        }
+      ],
+      "programmeSum": 38688898
+    },
+    "29": {
+      "page": 242,
+      "total": 3607861,
+      "programmes": [
+        {
+          "code": "230",
+          "name": "ADMINISTRATION OF JUSTICE",
+          "value": 3607861
+        }
+      ],
+      "programmeSum": 3607861
+    },
+    "30": {
+      "page": 249,
+      "total": 25600047,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 10927249
+        },
+        {
+          "code": "240",
+          "name": "LEGAL SERVICES",
+          "value": 10090974
+        },
+        {
+          "code": "241",
+          "name": "LEGAL REGISTRATION SERVICES",
+          "value": 0
+        },
+        {
+          "code": "242",
+          "name": "ADMINISTRATION OF JUSTICE",
+          "value": 0
+        },
+        {
+          "code": "244",
+          "name": "POLICE SERVICES",
+          "value": 0
+        },
+        {
+          "code": "245",
+          "name": "LAW ENFORCEMENT",
+          "value": 4581824
+        }
+      ],
+      "programmeSum": 25600047
+    },
+    "31": {
+      "page": 265,
+      "total": 165856986,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 22539609
+        },
+        {
+          "code": "043",
+          "name": "APPLICATION OF MODERN IT",
+          "value": 71154983
+        },
+        {
+          "code": "045",
+          "name": "NATIONAL TRANSFORMATION",
+          "value": 3024850
+        },
+        {
+          "code": "081",
+          "name": "DEVELOPMENT OF MANAGEMENT",
+          "value": 1376432
+        },
+        {
+          "code": "084",
+          "name": "ESTABLISHMENT OF GOVTECH AGENCY",
+          "value": 52929920
+        },
+        {
+          "code": "460",
+          "name": "INVESTMENT, INDUSTRIAL AND",
+          "value": 11219282
+        },
+        {
+          "code": "461",
+          "name": "PRODUCT STANDARDS",
+          "value": 3611910
+        }
+      ],
+      "programmeSum": 165856986
+    },
+    "32": {
+      "page": 290,
+      "total": 87961474,
+      "programmes": [
+        {
+          "code": "330",
+          "name": "Direction Formulation & Foreign Policy",
+          "value": 88861474
+        }
+      ],
+      "programmeSum": 88861474,
+      "programmeGap": 900000
+    },
+    "33": {
+      "page": 329,
+      "total": 134101598,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 9650156
+        },
+        {
+          "code": "042",
+          "name": "INFORMATION & MEDIA RELATIONS",
+          "value": 400000
+        },
+        {
+          "code": "044",
+          "name": "GOVERNMENT PRINTING SERVICES",
+          "value": 5395371
+        },
+        {
+          "code": "167",
+          "name": "NATIONAL METEOROLOGICAL SERVICES",
+          "value": 8240172
+        },
+        {
+          "code": "200",
+          "name": "NATIONAL EMERGENCY",
+          "value": 5054248
+        },
+        {
+          "code": "201",
+          "name": "IMMIGRATION REGULATORY SERVICES",
+          "value": 17603231
+        },
+        {
+          "code": "202",
+          "name": "FIRE FIGHTING SERVICES",
+          "value": 30070001
+        },
+        {
+          "code": "203",
+          "name": "INFORMATION AND BROADCASTING",
+          "value": 4526345
+        },
+        {
+          "code": "243",
+          "name": "CORRECTIVE AND REHABILITATIVE",
+          "value": 52054749
+        },
+        {
+          "code": "247",
+          "name": "SERVICES IN PUBLIC AFFAIRS",
+          "value": 1107325
+        }
+      ],
+      "programmeSum": 134101598
+    },
+    "35": {
+      "page": 356,
+      "total": 148348794,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION&POLICY FORMULATION",
+          "value": 9537942
+        },
+        {
+          "code": "278",
+          "name": "FAMILY",
+          "value": 3114183
+        },
+        {
+          "code": "365",
+          "name": "HIV/AIDS PREVENT & CONTROL",
+          "value": 98000
+        },
+        {
+          "code": "423",
+          "name": "PERSONAL SOCIAL SERVICES DELIVERY",
+          "value": 124940398
+        },
+        {
+          "code": "632",
+          "name": "GENDER AFFAIRS",
+          "value": 1375718
+        },
+        {
+          "code": "633",
+          "name": "SOCIAL POLICYRESEARCH&PLANNING",
+          "value": 929018
+        },
+        {
+          "code": "634",
+          "name": "POVERTY ALLEVIATION AND REDUCTIO",
+          "value": 8353535
+        },
+        {
+          "code": "635",
+          "name": "DISASTER SOCIAL RESPONSE AND RELI",
+          "value": 0
+        }
+      ],
+      "programmeSum": 148348794
+    },
+    "39": {
+      "page": 383,
+      "total": 278130846,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 25218941
+        },
+        {
+          "code": "241",
+          "name": "LEGAL REGISTRATION SERVICES",
+          "value": 13848763
+        },
+        {
+          "code": "242",
+          "name": "ADMINISTRATION OF JUSTICE",
+          "value": 33880878
+        },
+        {
+          "code": "244",
+          "name": "POLICE SERVICES",
+          "value": 205182264
+        }
+      ],
+      "programmeSum": 278130846
+    },
+    "40": {
+      "page": 408,
+      "total": 186137617,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 13321771
+        },
+        {
+          "code": "510",
+          "name": "ROAD NETWORK SERVICES",
+          "value": 92144052
+        },
+        {
+          "code": "511",
+          "name": "DRAINAGE SERVICES",
+          "value": 17955624
+        },
+        {
+          "code": "512",
+          "name": "SCOTLAND DISTRICT SPECIAL WORKS",
+          "value": 5022357
+        },
+        {
+          "code": "514",
+          "name": "GOVERNMENT VEHICLE SERVICES",
+          "value": 6047475
+        },
+        {
+          "code": "515",
+          "name": "ELECTRICAL ENGINEERING SERVICES",
+          "value": 16092252
+        },
+        {
+          "code": "516",
+          "name": "PUBLIC TRANSPORTATION SERVICES",
+          "value": 18942609
+        },
+        {
+          "code": "517",
+          "name": "TRANSPORT",
+          "value": 15681214
+        }
+      ],
+      "programmeSum": 185207354,
+      "programmeGap": -930263
+    },
+    "41": {
+      "page": 444,
+      "total": 87951778,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 35883194
+        },
+        {
+          "code": "114",
+          "name": "ENERGY & NATURAL RESOURCES",
+          "value": 41369090
+        },
+        {
+          "code": "128",
+          "name": "MICRO-ENTERPRISE DEVELOPMENT",
+          "value": 0
+        },
+        {
+          "code": "462",
+          "name": "COOPERATIVES DEVELOPMENT",
+          "value": 576105
+        },
+        {
+          "code": "463",
+          "name": "UTILITIES REGULATION",
+          "value": 6816164
+        },
+        {
+          "code": "465",
+          "name": "PRIVATE SECTOR ENHANCEMENT",
+          "value": 1026575
+        },
+        {
+          "code": "480",
+          "name": "DEVELOPMENT OF COMMERCE AND",
+          "value": 2280454
+        }
+      ],
+      "programmeSum": 87951582,
+      "programmeGap": -196
+    },
+    "44": {
+      "page": 475,
+      "total": 62439795,
+      "programmes": [
+        {
+          "code": "002",
+          "name": "ECONOMIC AND SOCIAL PLANNING",
+          "value": 2033821
+        },
+        {
+          "code": "332",
+          "name": "DEVELOPMENT OF TOURISM POTENTI",
+          "value": 49115974
+        },
+        {
+          "code": "337",
+          "name": "INVESTMENT PROMOTION AND",
+          "value": 8500000
+        },
+        {
+          "code": "425",
+          "name": "PROMOTION OF SPORTING ACHIEVEM",
+          "value": 2790000
+        }
+      ],
+      "programmeSum": 62439795
+    },
+    "50": {
+      "page": 746,
+      "total": 32670460,
+      "programmes": [
+        {
+          "code": "600",
+          "name": "POST OFFICE",
+          "value": 32670460
+        }
+      ],
+      "programmeSum": 32670460
+    },
+    "51": {
+      "page": 486,
+      "total": 66952191,
+      "programmes": [
+        {
+          "code": "279",
+          "name": "SPORTS AND COMMUNITY EMPOWERMEN",
+          "value": 22999989
+        },
+        {
+          "code": "422",
+          "name": "COMMUNITY DEVELOPMENT",
+          "value": 13648800
+        },
+        {
+          "code": "425",
+          "name": "PROMOTION OF SPORTING ACHIEVEMENT",
+          "value": 30303402
+        }
+      ],
+      "programmeSum": 66952191
+    },
+    "59": {
+      "page": 499,
+      "total": 121686086,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 4616359
+        },
+        {
+          "code": "163",
+          "name": "FISHERIES MANAGEMENT AND",
+          "value": 20261601
+        },
+        {
+          "code": "164",
+          "name": "GENERAL SUPPORT SERVICES",
+          "value": 7084877
+        },
+        {
+          "code": "400",
+          "name": "ENVIRONMENTAL HEALTH SERVICES",
+          "value": 6884923
+        },
+        {
+          "code": "650",
+          "name": "PRESERVATION AND CONSERVATION",
+          "value": 75782469
+        },
+        {
+          "code": "651",
+          "name": "PRIMARY ENVIRONMENTAL CARE",
+          "value": 7055857
+        }
+      ],
+      "programmeSum": 121686086
+    },
+    "63": {
+      "page": 526,
+      "total": 285919602,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 3983207
+        },
+        {
+          "code": "045",
+          "name": "NATIONAL TRANSFORMATION",
+          "value": 7614504
+        },
+        {
+          "code": "270",
+          "name": "TEACHER TRAINING",
+          "value": 15161548
+        },
+        {
+          "code": "273",
+          "name": "TERTIARY",
+          "value": 235446005
+        },
+        {
+          "code": "421",
+          "name": "OCCUPATIONAL TRAINING",
+          "value": 24714337
+        }
+      ],
+      "programmeSum": 286919601,
+      "programmeGap": 999999
+    },
+    "83": {
+      "page": 550,
+      "total": 112008129,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 16922968
+        },
+        {
+          "code": "160",
+          "name": "MEASURES TO STIMULATE INCREASED",
+          "value": 26427817
+        },
+        {
+          "code": "161",
+          "name": "MEASURES TO STIMULATE INCREASED",
+          "value": 11479089
+        },
+        {
+          "code": "162",
+          "name": "RESOURCE DEVELOPMENT AND",
+          "value": 24778298
+        },
+        {
+          "code": "164",
+          "name": "GENERAL SUPPORT SERVICES",
+          "value": 16629539
+        },
+        {
+          "code": "165",
+          "name": "ANCILLARY, TECHNICAL AND",
+          "value": 15270418
+        },
+        {
+          "code": "168",
+          "name": "SUPPORT OF MAJOR AGRICULTURAL",
+          "value": 500000
+        }
+      ],
+      "programmeSum": 112008129
+    },
+    "84": {
+      "page": 589,
+      "total": 20973014,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 11372893
+        },
+        {
+          "code": "120",
+          "name": "OPER OF NATIONAL INS & SOCIAL",
+          "value": 0
+        },
+        {
+          "code": "365",
+          "name": "HIV/AIDS PREVENT&CONTROL PROJ",
+          "value": 509654
+        },
+        {
+          "code": "420",
+          "name": "EMPLOYMENT & LABOUR RELATIONS",
+          "value": 7726774
+        },
+        {
+          "code": "484",
+          "name": "HUMAN RESOURCE STRATEGY",
+          "value": 1363693
+        }
+      ],
+      "programmeSum": 20973014
+    },
+    "86": {
+      "page": 612,
+      "total": 485755980,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 63844223
+        },
+        {
+          "code": "360",
+          "name": "PRIMARY HEALTH CARE SERVICES",
+          "value": 76126681
+        },
+        {
+          "code": "361",
+          "name": "HOSPITAL SERVICES",
+          "value": 253883076
+        },
+        {
+          "code": "362",
+          "name": "CARE OF THE DISABLED",
+          "value": 2145577
+        },
+        {
+          "code": "363",
+          "name": "PHARMACEUTICAL PROGRAM",
+          "value": 32256971
+        },
+        {
+          "code": "364",
+          "name": "CARE OF THE ELDERLY",
+          "value": 46163867
+        },
+        {
+          "code": "365",
+          "name": "HIV/AIDS PREVENTION AND CONTROL",
+          "value": 6018483
+        },
+        {
+          "code": "400",
+          "name": "ENVIRONMENTAL HEALTH SERVICES",
+          "value": 5317102
+        }
+      ],
+      "programmeSum": 485755980
+    },
+    "93": {
+      "page": 664,
+      "total": 136925650,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 10677874
+        },
+        {
+          "code": "365",
+          "name": "HIV/AIDS PREVENTION AND CONTROL",
+          "value": 864522
+        },
+        {
+          "code": "513",
+          "name": "GOVERNMENT BUILDING SERVICES",
+          "value": 20228517
+        },
+        {
+          "code": "520",
+          "name": "HOUSING PROGRAMME",
+          "value": 18498994
+        },
+        {
+          "code": "521",
+          "name": "LAND USE REGULATION AND",
+          "value": 10231992
+        },
+        {
+          "code": "522",
+          "name": "LAND AND PROPERTY ACQUISITION",
+          "value": 73966883
+        },
+        {
+          "code": "523",
+          "name": "PUBLIC SERVICE OFFICE PROGRAM",
+          "value": 2456868
+        }
+      ],
+      "programmeSum": 136925650
+    },
+    "96": {
+      "page": 688,
+      "total": 525222123,
+      "programmes": [
+        {
+          "code": "040",
+          "name": "DIRECTION & POLICY FORMULATION",
+          "value": 40363334
+        },
+        {
+          "code": "271",
+          "name": "BASIC EDUCATIONAL DEVELOPMENT",
+          "value": 243358282
+        },
+        {
+          "code": "272",
+          "name": "SECONDARY",
+          "value": 202538633
+        },
+        {
+          "code": "275",
+          "name": "SPECIAL SERVICES",
+          "value": 39711869
+        }
+      ],
+      "programmeSum": 525972118,
+      "programmeGap": 749995
+    }
+  }
+}
