@@ -285,6 +285,15 @@
     color:var(--muted);
   }
   ul.sources a{color:var(--brand)}
+  ul.caveats-list{
+    margin:0 0 12px;
+    padding-left:18px;
+    font-size:13px;
+    line-height:1.55;
+    color:#6b5312;
+  }
+  ul.caveats-list li{margin-bottom:5px}
+  ul.caveats-list:empty{display:none}
   ul.sources .supports{color:var(--muted)}
   .badge{
     display:inline-block;
@@ -448,6 +457,7 @@
   <div class="sources-box">
     <h3>Where these figures come from</h3>
     <p id="basisNote" class="basis"></p>
+    <ul id="caveatList" class="caveats-list"></ul>
     <ul id="sourceList" class="sources"></ul>
     <p class="caveat">A source is marked <strong>verified</strong> only where the build reconciles every figure it
       provides against the totals printed in that document. Anything still marked <strong>unverified</strong> has not
@@ -747,7 +757,9 @@ function normaliseRow(row, defaultTone){
     note: row.note ? String(row.note) : '',
     tone: row.tone ? String(row.tone) : defaultTone,
     // Which official line(s) this category is built from, for the tooltip.
-    from: Array.isArray(row.from) ? row.from.map(String) : []
+    from: Array.isArray(row.from) ? row.from.map(String) : [],
+    // Notable components sitting inside this category.
+    includes: Array.isArray(row.includes) ? row.includes : []
   };
 }
 
@@ -1166,6 +1178,12 @@ function attachInteractions(model, flows){
       note.textContent = node.note;
       tooltipEl.appendChild(note);
     }
+    for(const part of (node.includes || [])){
+      const inc = document.createElement('span');
+      inc.className = 't-value';
+      inc.textContent = `of which ${moneyUnit(part.value)} — ${part.label}`;
+      tooltipEl.appendChild(inc);
+    }
     if(node.from && node.from.length){
       const src = document.createElement('span');
       src.className = 't-note';
@@ -1333,6 +1351,14 @@ function applyMeta(meta){
   // Source links are built from the data, so citing a new document is a data
   // edit rather than a code edit. Links open in a new tab and carry rel
   // attributes because they point off-site.
+  const caveats = document.getElementById('caveatList');
+  caveats.replaceChildren();
+  for(const text of (meta.caveats || [])){
+    const li = document.createElement('li');
+    li.textContent = text;
+    caveats.appendChild(li);
+  }
+
   const list = document.getElementById('sourceList');
   list.replaceChildren();
   for(const src of (meta.sources || [])){

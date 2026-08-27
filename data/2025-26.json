@@ -21,6 +21,10 @@
         "healthcare"
       ]
     },
+    "caveats": [
+      "\u201cRunning the government\u201d includes BDS$361.48m of public service pensions and gratuities, which the official classification places under General Public Services rather than social protection. Administration excluding pensions is about BDS$573.73m.",
+      "\u201cWelfare & social protection\u201d therefore excludes public service pensions, and is much smaller than the total the state spends supporting people."
+    ],
     "sources": [
       {
         "label": "Barbados Approved Estimates of Revenue and Expenditure 2025-2026",
@@ -153,6 +157,13 @@
       "note": "Core government operations, excluding debt service",
       "from": [
         "General Public Services less debt service"
+      ],
+      "includes": [
+        {
+          "label": "Public service pensions and gratuities",
+          "value": 361.48,
+          "note": "Head 14, programme 117 \u2014 classified here, not under welfare"
+        }
       ]
     },
     {

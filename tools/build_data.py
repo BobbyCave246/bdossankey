@@ -178,6 +178,14 @@ def build(year, cfg):
     amortisation = find_row(debt_lines, "Debt Amortization", dcol)
     debt_service = find_row(debt_lines, "Debt service", dcol)
 
+    # Public-service pensions are paid from Head 14 (Ministry of Finance,
+    # programme 117 PENSIONS), so the functional classification puts them in
+    # General Public Services rather than Social Protection. Readers take
+    # "running the government" to mean administration, so the amount is
+    # extracted and disclosed instead of being left buried.
+    pensions = (find_row(debt_lines, "Retiring Benefits", dcol)
+                + find_row(debt_lines, "Other Retiring Benefits", dcol))
+
     # ---- reconciliations: fail loudly rather than publish a guess ----
     checks = []
 
@@ -199,6 +207,10 @@ def build(year, cfg):
     ex_amortisation = non_gps + admin_ex_debt + interest + loan_expenses
     checks.append(("debt service nests inside General Public Services",
                    ex_amortisation, expenditure_total - amortisation))
+
+    if not 0 < pensions < admin_ex_debt:
+        sys.exit(f"{year}: pensions of {pensions:,} do not sit inside "
+                 f"General Public Services less debt service ({admin_ex_debt:,})")
 
     failed = [(what, a, b) for what, a, b in checks if a != b]
     if failed:
@@ -226,13 +238,20 @@ def build(year, cfg):
     spending_out = []
     for cid_, label, parts, note in MAPPING:
         total = sum(functions[p] for p in parts)
-        if cid_ == "administration":
-            total -= debt_service          # lift debt service out of GPS
-        spending_out.append({
+        entry = {
             "id": cid_, "label": label, "value": rnd(total), "note": note,
             "from": parts if cid_ != "administration"
                     else ["General Public Services less debt service"],
-        })
+        }
+        if cid_ == "administration":
+            total -= debt_service          # lift debt service out of GPS
+            entry["value"] = rnd(total)
+            entry["includes"] = [{
+                "label": "Public service pensions and gratuities",
+                "value": rnd(pensions),
+                "note": "Head 14, programme 117 — classified here, not under welfare",
+            }]
+        spending_out.append(entry)
     spending_out.append({
         "id": "debt", "label": "Debt interest",
         "value": rnd(interest + loan_expenses), "tone": "debt",
@@ -268,6 +287,14 @@ def build(year, cfg):
                 "label": "Barbados Statistical Service, end-2025",
             },
             "highlights": {"debtId": "debt", "compareIds": ["education", "healthcare"]},
+            "caveats": [
+                f"“Running the government” includes BDS${pensions / m:,.2f}m of public service "
+                f"pensions and gratuities, which the official classification places under General "
+                f"Public Services rather than social protection. Administration excluding pensions "
+                f"is about BDS${(admin_ex_debt - pensions) / m:,.2f}m.",
+                "“Welfare & social protection” therefore excludes public service pensions, and is "
+                "much smaller than the total the state spends supporting people.",
+            ],
             "sources": [
                 {
                     "label": f"Barbados {cfg['status']} of Revenue and Expenditure {year.replace('-', '-20')}",

@@ -90,6 +90,83 @@ Two consequences:
    source the earlier figures came from, not a coincidence. It no longer affects
    the page, but it is worth knowing if those numbers were published elsewhere.
 
+## Classification: where public-service pensions sit
+
+Public-service pensions are paid from **Head 14, Ministry of Finance, programme
+117 PENSIONS**, so the functional classification puts them under General Public
+Services — which is what the chart labels *Running the government* — rather than
+under Social Protection.
+
+| | Pensions | Running the government | Share | Administration excl. pensions |
+| --- | --- | --- | --- | --- |
+| FY2025/26 | 361.48 | 935.21 | 38.7% | 573.73 |
+| FY2026/27 | 433.83 | 1,289.96 | 33.6% | 856.13 |
+
+Verified two independent ways for each year: the Head 14 programme table, and
+Table 6's `Retiring Benefits` + `Other Retiring Benefits` lines. The two agree
+exactly for FY2025/26 and within $2 for FY2026/27.
+
+The build extracts this figure, asserts it sits inside General Public Services
+less debt service, and publishes it as an `includes` entry on the category plus
+a caveat on the page. The classification itself is left as the government
+publishes it — moving pensions into welfare would reintroduce exactly the
+editorial judgement this rebuild removed.
+
+Two consequences for reading the chart:
+
+- **Welfare & social protection is not what the state spends supporting people.**
+  At 83.46m it excludes public-service pensions entirely.
+- **The +37.9% rise in "Running the government" is mostly not pensions.**
+  Pensions rise 72.35; administration excluding pensions rises 282.40
+  (573.73 → 856.13, +49.2%). The growth is real and needs a separate explanation.
+
+## Depth available in the source books
+
+The Estimates run to four levels, all present in `sources/`:
+
+```
+Head (ministry)  →  Programme  →  Sub-programme  →  Object code
+```
+
+Education's 738.97m for FY2025/26 is two ministries:
+
+| | | BDS$ |
+| --- | --- | --- |
+| Head 96 | Ministry of Educational Transformation | **488.57** |
+| | 271 Basic Educational Development | 229.78 |
+| | 272 Secondary | 191.52 |
+| | 275 Special Services | 39.74 |
+| | 040 Direction and Policy Formation | 27.53 |
+| Head 95 | Ministry of Training and Tertiary Education | **248.40** |
+| | 273 Tertiary | 213.01 |
+| | 421 Occupational Training | 22.69 |
+| | 270 Teacher's Training | 7.72 |
+| | 080 Development of Managerial & Personal Skills | 3.05 |
+| | 045 National Transformation | 1.93 |
+| | Residual classified to education elsewhere | 2.00 |
+
+Both head totals were read from the verified 2025-26 column and their programme
+rows sum to those totals (Head 95 exactly; Head 96 out by $1 on the document's
+own rounding). The 2.00m residual against the functional total of 738.97m is not
+yet explained.
+
+Below programme level the books name individual institutions — Health's
+sub-programmes list polyclinics one by one, for example. A drill-down to that
+depth is buildable.
+
+**What it needs first:** a head → function mapping. Health is clean (Head 86 =
+379,464,695 = the Health function exactly), and education is two heads plus a
+2.00m residual, so the mapping is close to one-to-one but not exactly. It has to
+be derived head by head and then verified by checking that each function's heads
+sum to that function's published total — the same standard as the rest of the
+build. It is tractable but it is not done, and no head-level figures are used by
+the chart today.
+
+One extraction obstacle to be aware of: on head pages where all six year columns
+are populated, adjacent columns can merge into a single token
+(`415,891,980379,464,695`), so a head-level parser needs character-level column
+splitting rather than whitespace tokens.
+
 ## Still open
 
 - **Population is unverified.** The build uses 261,692 (Barbados Statistical
