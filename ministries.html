@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Barbados Budget – Ministries and Programmes</title>
+<style>
+  /* Deliberately the same tokens as index.html so the two pages read as one
+     site. Nothing here is data-dependent. */
+  :root{
+    --bg:#f5f7fa;
+    --panel:#ffffff;
+    --text:#16202a;
+    --muted:#4d5b68;
+    --border:#dbe2e8;
+    --brand:#00267f;
+    --soft-blue:#eef3fb;
+    --spend-dark:#1f4b99;
+    --warn-bg:#fff8e6;
+    --warn-border:#e8cf8a;
+    --warn-text:#6b5312;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .page{
+    max-width:1100px;
+    margin:24px auto;
+    background:var(--panel);
+    padding:28px 30px 24px;
+    box-shadow:0 10px 36px rgba(0,0,0,.08);
+    border-radius:12px;
+  }
+
+  .back{
+    display:inline-block;
+    margin-bottom:14px;
+    color:var(--spend-dark);
+    font-weight:700;
+    font-size:14px;
+    text-decoration:none;
+  }
+  .back:hover{text-decoration:underline}
+
+  h1{
+    margin:0;
+    color:var(--brand);
+    line-height:1.1;
+    font-size:32px;
+    letter-spacing:-.6px;
+  }
+  .subtitle{margin-top:8px; color:var(--muted); font-size:15px; max-width:78ch}
+
+  .toggle{
+    display:inline-flex;
+    gap:4px;
+    background:#eef2f6;
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:4px;
+    margin:18px 0 4px;
+  }
+  .toggle button{
+    border:0;
+    background:transparent;
+    padding:7px 14px;
+    border-radius:999px;
+    font:inherit;
+    font-size:13px;
+    font-weight:700;
+    color:var(--muted);
+    cursor:pointer;
+  }
+  .toggle button.is-active{background:var(--panel); color:var(--brand); box-shadow:0 1px 3px rgba(0,0,0,.12)}
+
+  .callout{
+    margin:18px 0 6px;
+    padding:14px 16px;
+    border-radius:10px;
+    border:1px solid var(--border);
+    background:var(--soft-blue);
+    font-size:14px;
+    line-height:1.55;
+  }
+  .callout.warn{background:var(--warn-bg); border-color:var(--warn-border); color:var(--warn-text)}
+  .callout strong{font-weight:800}
+  .callout p{margin:0 0 8px}
+  .callout p:last-child{margin-bottom:0}
+
+  .totals{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin:16px 0 4px;
+  }
+  .tile{
+    flex:1 1 200px;
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:12px 14px;
+    background:var(--soft-blue);
+  }
+  .tile .k{font-size:12px; color:var(--muted); font-weight:700; text-transform:uppercase; letter-spacing:.4px}
+  .tile .v{font-size:22px; font-weight:800; color:var(--spend-dark); margin-top:4px}
+
+  table{width:100%; border-collapse:collapse; margin-top:14px; font-size:14px}
+  caption{text-align:left; font-weight:800; padding:14px 0 6px; font-size:15px}
+  th,td{padding:8px 10px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top}
+  th{font-size:12px; text-transform:uppercase; letter-spacing:.4px; color:var(--muted)}
+  td.num, th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+
+  details.head{
+    border:1px solid var(--border);
+    border-radius:10px;
+    margin-top:8px;
+    background:var(--panel);
+    overflow:hidden;
+  }
+  details.head[open]{box-shadow:0 2px 10px rgba(0,0,0,.05)}
+  details.head.is-verified{border-color:var(--spend-dark)}
+  summary{
+    cursor:pointer;
+    padding:12px 14px;
+    display:flex;
+    align-items:baseline;
+    gap:12px;
+    font-weight:700;
+    list-style:none;
+  }
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:'▸'; color:var(--muted); font-size:12px; flex:0 0 auto}
+  details[open]>summary::before{content:'▾'}
+  summary .hnum{
+    font-size:12px;
+    color:var(--muted);
+    font-weight:800;
+    flex:0 0 auto;
+    min-width:64px;
+  }
+  summary .hname{flex:1 1 auto}
+  summary .hval{font-variant-numeric:tabular-nums; color:var(--spend-dark); flex:0 0 auto}
+  .head-body{padding:0 14px 12px}
+  .flag-note{
+    margin:6px 0 0;
+    padding:8px 10px;
+    border-radius:8px;
+    background:var(--warn-bg);
+    border:1px solid var(--warn-border);
+    color:var(--warn-text);
+    font-size:13px;
+  }
+  .verified-chip{
+    display:inline-block;
+    background:var(--spend-dark);
+    color:#fff;
+    border-radius:999px;
+    padding:2px 9px;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:.3px;
+  }
+
+  footer{margin-top:26px; padding-top:14px; border-top:1px solid var(--border); color:var(--muted); font-size:13px; line-height:1.6}
+  code{background:#eef2f6; padding:1px 5px; border-radius:4px; font-size:.92em}
+  #error{display:none; margin-top:18px}
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back" href="index.html" id="backLink">← Back to the budget chart</a>
+
+  <h1 id="pageTitle">Ministries and programmes</h1>
+  <p class="subtitle" id="pageSubtitle">
+    Every ministry in the Estimates, and the programmes inside it.
+  </p>
+
+  <div class="toggle" id="yearToggle" role="group" aria-label="Budget year" hidden></div>
+
+  <div id="context"></div>
+  <div id="totals" class="totals"></div>
+  <div id="heads"></div>
+
+  <div id="error" class="callout warn"></div>
+
+  <footer>
+    <p>
+      Figures are read from each ministry's own summary table in the Estimates by
+      <code>tools/build_heads.py</code> and reconciled against the printed totals; the build
+      refuses to emit a file if a check fails. See <code>SOURCES.md</code> for what is
+      checked and for the discrepancies the documents themselves contain.
+    </p>
+    <p id="sourceNote"></p>
+  </footer>
+</div>
+
+<script>
+'use strict';
+
+/* --------------------------------------------------------------------------
+   This page shows ministries and their programmes as their own tree. It is
+   deliberately NOT presented as a decomposition of the spending categories on
+   the front page: those categories are the government's functional
+   classification (Table 5), and for eight or nine of the ten functions no
+   combination of whole ministries reproduces the published total. Where the
+   arithmetic does verify — Health in both years, Education in 2026-27 — the
+   ministries are named and marked. Everywhere else the page says plainly that
+   the link cannot be drawn.
+   -------------------------------------------------------------------------- */
+
+const MONEY = new Intl.NumberFormat('en-US', {maximumFractionDigits:0});
+const money = v => '$' + MONEY.format(v);
+const M2 = new Intl.NumberFormat('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+const millions = v => '$' + M2.format(v/1e6) + 'm';
+
+/* Which Table 5 function(s) each front-page category is built from. This
+   mirrors the `from` field the data files already carry, and is the only thing
+   that connects a clicked category to this page. */
+const CATEGORY_FUNCTIONS = {
+  education:      ['Education'],
+  healthcare:     ['Health'],
+  welfare:        ['Social Protection'],
+  infrastructure: ['Housing and Community Amenities', 'Environmental Protection'],
+  economy:        ['Economic Affairs'],
+  safety:         ['Public Order And Safety', 'Defense'],
+  community:      ['Recreation, Culture and Religion'],
+  administration: ['General Public Services'],
+  debt:           ['General Public Services']
+};
+
+const CATEGORY_LABELS = {
+  education:'Education & skills', healthcare:'Healthcare',
+  welfare:'Welfare & social protection', infrastructure:'Housing, water & environment',
+  economy:'Roads, transport & the economy', safety:'Police, courts & defence',
+  community:'Sport, culture & community', administration:'Running the government',
+  debt:'Debt interest'
+};
+
+async function fetchJson(url){
+  const res = await fetch(url, {cache:'no-store'});
+  if(!res.ok) throw new Error(url + ' → HTTP ' + res.status);
+  return res.json();
+}
+
+function el(tag, cls, text){
+  const n = document.createElement(tag);
+  if(cls) n.className = cls;
+  if(text != null) n.textContent = text;
+  return n;
+}
+
+function params(){
+  const q = new URLSearchParams(location.search);
+  return {year: q.get('year') || '', category: q.get('category') || ''};
+}
+
+/* ---------------------------- rendering ---------------------------- */
+
+function drawContext(book, category){
+  const box = document.getElementById('context');
+  box.replaceChildren();
+
+  const functions = CATEGORY_FUNCTIONS[category] || null;
+  const mapped = book.meta.headToFunction || {};
+
+  if(!functions){
+    const c = el('div','callout');
+    c.append(el('p', null,
+      'Every ministry in the Estimates for this year, with the programmes inside it. ' +
+      'Open a ministry to see its programmes.'));
+    c.append(el('p', null,
+      'These are ministries, not the spending categories on the front page. Those ' +
+      'categories are the government’s functional classification, which is applied ' +
+      'below ministry level — so the two do not line up one-to-one.'));
+    box.appendChild(c);
+    return [];
+  }
+
+  // Verified only if every function behind the clicked category maps to heads.
+  const verified = functions.every(f => Array.isArray(mapped[f]));
+  const heads = verified ? [...new Set(functions.flatMap(f => mapped[f]))] : [];
+  const label = CATEGORY_LABELS[category] || category;
+
+  if(verified){
+    const c = el('div','callout');
+    const names = heads.map(h => 'Head ' + h + ' ' + titleish((book.heads[h]||{}).name || ''));
+    c.append(el('p', null,
+      '“' + label + '” on the front page is the official function ' +
+      functions.join(' + ') + ', and for this year that function is exactly ' +
+      names.join(' + ') + '. The build verified this: those ministry totals sum to the ' +
+      'published function total to the dollar.'));
+    c.append(el('p', null,
+      'Those ministries are marked and listed first below. The rest of the Estimates ' +
+      'follows, for context.'));
+    box.appendChild(c);
+  }else{
+    const c = el('div','callout warn');
+    c.append(el('p', null,
+      'This category cannot be broken down into ministries.'));
+    c.append(el('p', null,
+      '“' + label + '” is the official function ' + functions.join(' + ') + '. No ' +
+      'combination of whole ministries adds up to that function’s published total, ' +
+      'because the government applies the classification below ministry level — and ' +
+      'in places below programme level. Drawing a ministry list here and calling it ' +
+      'the breakdown of this category would be an invention.'));
+    c.append(el('p', null,
+      'What follows is every ministry in the Estimates, on its own terms. It is the ' +
+      'real spending detail; it just does not nest inside the category you clicked.'));
+    box.appendChild(c);
+  }
+  return heads;
+}
+
+/* The books print ministry names in capitals; soften them without mangling
+   apostrophes or the "and" in a name. */
+function titleish(name){
+  return name.toLowerCase()
+    .replace(/(^|[\s(\/&-])([a-z])/g, (m,a,b)=>a+b.toUpperCase())
+    // Acronyms the books write in capitals and title case would flatten.
+    .replace(/\b(Hiv|Aids|It|Mgmt|Ofis|Psvs|Ngo)\b/g, s=>s.toUpperCase());
+}
+
+function drawTotals(book){
+  const box = document.getElementById('totals');
+  box.replaceChildren();
+  const heads = Object.values(book.heads);
+  const excluded = new Set((book.meta.excludedHeads||[]).map(String));
+  const counted = Object.entries(book.heads).filter(([id]) => !excluded.has(id));
+  const programmes = counted.reduce((n,[,h]) => n + h.programmes.length, 0);
+
+  const tiles = [
+    ['Total expenditure', millions(book.meta.totalExpenditure)],
+    ['Ministries', String(counted.length)],
+    ['Programmes', String(programmes)],
+    ['Functions reproducible from whole ministries',
+     Object.keys(book.meta.headToFunction||{}).length + ' of 10']
+  ];
+  for(const [k,v] of tiles){
+    const t = el('div','tile');
+    t.append(el('div','k',k), el('div','v',v));
+    box.appendChild(t);
+  }
+}
+
+function programmeTable(head){
+  const table = el('table');
+  const thead = el('thead');
+  const hr = el('tr');
+  hr.append(el('th', null, 'Programme'), el('th', null, 'Name'), el('th','num','BDS$'));
+  thead.appendChild(hr);
+  const tbody = el('tbody');
+  for(const p of head.programmes){
+    const tr = el('tr');
+    tr.append(el('td', null, p.code), el('td', null, titleish(p.name)),
+              el('td','num', p.value == null ? '—' : money(p.value)));
+    tbody.appendChild(tr);
+  }
+  const tfoot = el('tfoot');
+  const fr = el('tr');
+  fr.append(el('td', null, ''), el('td', null, 'Total for this ministry'),
+            el('td','num', money(head.total)));
+  tfoot.appendChild(fr);
+  table.append(thead, tbody, tfoot);
+  return table;
+}
+
+function drawHeads(book, verifiedHeads){
+  const box = document.getElementById('heads');
+  box.replaceChildren();
+
+  const excluded = new Set((book.meta.excludedHeads||[]).map(String));
+  const verified = new Set(verifiedHeads.map(String));
+  const entries = Object.entries(book.heads)
+    .filter(([id]) => !excluded.has(id))
+    .sort((a,b) => {
+      const av = verified.has(a[0]) ? 0 : 1, bv = verified.has(b[0]) ? 0 : 1;
+      if(av !== bv) return av - bv;
+      return b[1].total - a[1].total;
+    });
+
+  for(const [id, head] of entries){
+    const d = el('details','head' + (verified.has(id) ? ' is-verified' : ''));
+    if(verified.has(id)) d.open = true;
+    const s = el('summary');
+    s.append(el('span','hnum','Head ' + id), el('span','hname', titleish(head.name || '')));
+    if(verified.has(id)) s.appendChild(el('span','verified-chip','verified'));
+    s.appendChild(el('span','hval', millions(head.total)));
+    d.appendChild(s);
+
+    const body = el('div','head-body');
+    body.appendChild(programmeTable(head));
+
+    // The books' own gaps, shown against the ministry they belong to rather
+    // than hidden in a build log.
+    if(head.programmeGap){
+      const gap = head.programmeGap;
+      body.appendChild(el('p','flag-note',
+        'In the published book, this ministry’s programme rows ' +
+        (gap < 0
+          ? 'fall ' + money(-gap) + ' short of its own printed total.'
+          : 'exceed its own printed total by ' + money(gap) + '.') +
+        ' The ministry total above is the printed one.'));
+    }
+    d.appendChild(body);
+    box.appendChild(d);
+  }
+
+  if(!entries.length){
+    box.appendChild(el('p','callout warn','No ministries could be read for this year.'));
+  }
+}
+
+function drawYearToggle(years, activeId, category){
+  const bar = document.getElementById('yearToggle');
+  bar.replaceChildren();
+  if(years.length < 2){ bar.hidden = true; return; }
+  bar.hidden = false;
+  for(const entry of years){
+    const btn = el('button', entry.id === activeId ? 'is-active' : null, entry.label || entry.id);
+    btn.type = 'button';
+    btn.setAttribute('aria-pressed', String(entry.id === activeId));
+    btn.addEventListener('click', ()=>{
+      const q = new URLSearchParams({year: entry.id});
+      if(category) q.set('category', category);
+      location.search = q.toString();
+    });
+    bar.appendChild(btn);
+  }
+}
+
+function fail(message){
+  const box = document.getElementById('error');
+  box.style.display = 'block';
+  box.replaceChildren(el('p', null, message));
+}
+
+async function init(){
+  const {year, category} = params();
+
+  let manifest = null;
+  try{ manifest = await fetchJson('data/index.json'); }
+  catch(err){ console.info('No year manifest:', err.message); }
+
+  const years = (manifest && Array.isArray(manifest.years)) ? manifest.years : [];
+  const activeId = year || (manifest && manifest.default) || (years[0] && years[0].id) || '2025-26';
+  const entry = years.find(y => y.id === activeId);
+
+  document.getElementById('backLink').textContent = '← Back to the budget chart';
+
+  let book;
+  try{
+    book = await fetchJson('data/heads-' + activeId + '.json');
+  }catch(err){
+    fail('Could not load data/heads-' + activeId + '.json (' + err.message + '). ' +
+         'Run "python3 tools/build_heads.py" to generate it, and serve this ' +
+         'directory over HTTP rather than opening the file directly.');
+    return;
+  }
+
+  document.getElementById('pageSubtitle').textContent =
+    'Every ministry in the ' + (entry ? entry.label : activeId) + ', and the programmes ' +
+    'inside it. Figures are BDS$, as printed in the Estimates.';
+  document.getElementById('sourceNote').textContent =
+    'Source: ' + book.meta.source + '. ' + book.meta.note;
+
+  drawYearToggle(years, activeId, category);
+  const verifiedHeads = drawContext(book, category);
+  drawTotals(book);
+  drawHeads(book, verifiedHeads);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -185,8 +185,24 @@ the reason concrete.
 
 So the government applies the functional classification below head level, and in
 places below programme level. The books never publish the crosswalk: "functional"
-appears in both documents only at Table 5 itself. That is why no head-level
-drill-down is published and why the chart still shows only the Table 5 figures.
+appears in both documents only at Table 5 itself.
+
+### How the pages handle that
+
+Clicking any spending category on the chart opens `ministries.html`, which shows
+every ministry and the programmes inside it, with the head and programme figures
+above. The page does not pretend the category decomposes into ministries:
+
+- Where the arithmetic **does** verify — Healthcare in both years, Education in
+  FY2026/27 — the page names those ministries, marks them `verified`, opens them
+  first, and says the totals sum to the published function total to the dollar.
+- Everywhere else it says plainly that the category cannot be broken down into
+  ministries, gives the reason, and presents the ministry list on its own terms
+  rather than as a breakdown of the category clicked.
+
+Ministries whose programme rows disagree with their own printed total carry that
+discrepancy on the ministry itself, with the amount, rather than only in a build
+log. The chart's own figures are unchanged: it still shows only Table 5.
 
 The **2.00m education residual is real and specific to the 2025-26 book.**
 Heads 95 + 96 are 736,969,536 against an Education function of 738,969,220 — a

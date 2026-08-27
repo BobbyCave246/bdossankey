@@ -86,7 +86,12 @@ def _bands(page):
 
 
 def _text_lines(page, bands):
-    """One (label, [six column values]) pair per physical line of text.
+    """One (label, wide label, [six column values]) triple per line of text.
+
+    The wide label reaches into the first money column. Ministry names in the
+    page header run past where the figures start, so they would otherwise be
+    clipped; figures never appear on those lines, so the caller uses the wide
+    reading only when it contains no digits.
 
     Values are read from characters, not words. A column with no figure reads
     as 0; a column whose characters do not form a number reads as None, so a
@@ -101,16 +106,18 @@ def _text_lines(page, bands):
                                  if lo <= (c["x0"] + c["x1"]) / 2 <= hi))
 
         label = re.sub(r"\s+", " ", span(-1e9, bands[0][0])).strip()
+        wide = re.sub(r"\s+", " ", span(-1e9, bands[1][0])).strip()
         vals = []
         for lo, hi in bands:
             s = span(lo, hi).replace(",", "").strip()
             vals.append(int(s) if re.fullmatch(r"-?\d+", s) else (None if s else 0))
-        lines.append((label, vals))
+        lines.append((label, wide, vals))
     return lines
 
 
 PROG_RE = re.compile(r"^(\d{3})\s+(\S.*)$")
 TOTAL_RE = re.compile(r"^Total\s+Head\s+(\d+)\s*:?$")
+HEAD_RE = re.compile(r"^HEAD\s+(\d+)$")
 
 
 def read_head(pdf, first_page):
@@ -120,11 +127,20 @@ def read_head(pdf, first_page):
         raise LookupError(f"no '$' column row on page {first_page}")
 
     progs, total, head, pending = [], None, None, None
+    # The ministry's name sits in the label column between the "HEAD nn" line
+    # and the first programme row, wrapped over one or two lines.
+    name_parts, in_name = [], False
     page = first_page
     while total is None and page <= first_page + 4:
-        for label, vals in _text_lines(pdf.pages[page - 1],
-                                       _bands(pdf.pages[page - 1]) or bands):
+        for label, wide, vals in _text_lines(pdf.pages[page - 1],
+                                             _bands(pdf.pages[page - 1]) or bands):
             populated = any(vals)
+            m = HEAD_RE.match(label)
+            if m:
+                head = int(m.group(1))
+                # Continuation pages repeat the header; keep the first reading.
+                in_name = not name_parts
+                continue
             m = TOTAL_RE.match(label)
             if m:
                 head = int(m.group(1))
@@ -135,12 +151,16 @@ def read_head(pdf, first_page):
                 continue
             m = PROG_RE.match(label)
             if m:
+                in_name = False
                 # A programme's figures sit on the label's line, or — when the
                 # name wraps — on the line below it.
                 pending = ("prog", m.group(1), m.group(2).strip())
                 if populated:
                     progs.append((m.group(1), m.group(2).strip(), vals))
                     pending = None
+                continue
+            if in_name and label and not populated:
+                name_parts.append(wide if not re.search(r"\d", wide) else label)
                 continue
             if populated and pending:
                 if pending[0] == "prog":
@@ -151,7 +171,7 @@ def read_head(pdf, first_page):
                 if total:
                     break
         page += 1
-    return head, progs, total
+    return head, re.sub(r'\s+', ' ', ' '.join(name_parts)).strip(), progs, total
 
 
 def head_pages(pdf):
@@ -332,12 +352,13 @@ def build(year, cfg):
 
         heads = {}
         for first in head_pages(pdf):
-            head, progs, total = read_head(pdf, first)
+            head, name, progs, total = read_head(pdf, first)
             if head is None or total is None:
                 failures.append(f"page {first}: no 'Total Head' row found")
                 continue
             entry = {
                 "page": first,
+                "name": name,
                 "total": total[col],
                 "programmes": [{"code": c, "name": n, "value": v[col]} for c, n, v in progs],
             }

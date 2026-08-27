@@ -54,6 +54,7 @@
   "heads": {
     "10": {
       "page": 68,
+      "name": "OFFICE OF THE PRESIDENT",
       "total": 3551044,
       "programmes": [
         {
@@ -66,6 +67,7 @@
     },
     "12": {
       "page": 75,
+      "name": "PARLIAMENT",
       "total": 17190950,
       "programmes": [
         {
@@ -78,6 +80,7 @@
     },
     "13": {
       "page": 84,
+      "name": "PRIME MINSITER'S OFFICEExpenditure",
       "total": 380226814,
       "programmes": [
         {
@@ -155,6 +158,7 @@
     },
     "14": {
       "page": 139,
+      "name": "MINISTRY OF FINANCEExpenditure",
       "total": 781535939,
       "programmes": [
         {
@@ -198,6 +202,7 @@
     },
     "15": {
       "page": 173,
+      "name": "CABINET OFFICE",
       "total": 42559241,
       "programmes": [
         {
@@ -225,6 +230,7 @@
     },
     "17": {
       "page": 189,
+      "name": "OMBUDSMAN",
       "total": 1173595,
       "programmes": [
         {
@@ -237,6 +243,7 @@
     },
     "18": {
       "page": 196,
+      "name": "AUDIT",
       "total": 5983141,
       "programmes": [
         {
@@ -249,6 +256,7 @@
     },
     "19": {
       "page": 756,
+      "name": "TREASURY",
       "total": 1653642580,
       "programmes": [
         {
@@ -277,6 +285,7 @@
     },
     "20": {
       "page": 203,
+      "name": "MINISTRY OF THE PUBLIC SERVICE AND TALENT DEVELOPMENT",
       "total": 19066998,
       "programmes": [
         {
@@ -304,6 +313,7 @@
     },
     "27": {
       "page": 217,
+      "name": "MINISTRY OF TOURISM AND INTERNATIONAL TRANSPORT",
       "total": 38688898,
       "programmes": [
         {
@@ -346,6 +356,7 @@
     },
     "29": {
       "page": 242,
+      "name": "OFFICE OF THE DIRECTOR OF PUBLIC PROSECUTIONS",
       "total": 3607861,
       "programmes": [
         {
@@ -358,6 +369,7 @@
     },
     "30": {
       "page": 249,
+      "name": "ATTORNEY GENERAL",
       "total": 25600047,
       "programmes": [
         {
@@ -395,6 +407,7 @@
     },
     "31": {
       "page": 265,
+      "name": "MINISTRY OF INNOVATION, INDUSTRY, SCIENCE AND TECHNOLOGY",
       "total": 165856986,
       "programmes": [
         {
@@ -437,6 +450,7 @@
     },
     "32": {
       "page": 290,
+      "name": "FOREIGN AFFAIRS&FOREIGN TRADE",
       "total": 87961474,
       "programmes": [
         {
@@ -450,6 +464,7 @@
     },
     "33": {
       "page": 329,
+      "name": "MINISTRY OF HOME AFFAIRS AND INFORMATION",
       "total": 134101598,
       "programmes": [
         {
@@ -507,6 +522,7 @@
     },
     "35": {
       "page": 356,
+      "name": "MINISTRY OF PEOPLE EMPOWERMENT AND Expenditure ELDER AFFAIRS",
       "total": 148348794,
       "programmes": [
         {
@@ -554,6 +570,7 @@
     },
     "39": {
       "page": 383,
+      "name": "MINISTRY OF LEGAL AFFAIRS AND CRIMINAL JUSTICE",
       "total": 278130846,
       "programmes": [
         {
@@ -581,6 +598,7 @@
     },
     "40": {
       "page": 408,
+      "name": "MINISTRY OF TRANSPORT AND WORKS",
       "total": 186137617,
       "programmes": [
         {
@@ -629,6 +647,7 @@
     },
     "41": {
       "page": 444,
+      "name": "MINISTRY OF ENERGY, BUSINESS DEVELOPMENT AND CONSUMER AFFAIRS",
       "total": 87951778,
       "programmes": [
         {
@@ -672,6 +691,7 @@
     },
     "44": {
       "page": 475,
+      "name": "MINISTRY OF PRIVATE AND PUBLIC Expenditure INVESTMENT",
       "total": 62439795,
       "programmes": [
         {
@@ -699,6 +719,7 @@
     },
     "50": {
       "page": 746,
+      "name": "POST OFFICE",
       "total": 32670460,
       "programmes": [
         {
@@ -711,6 +732,7 @@
     },
     "51": {
       "page": 486,
+      "name": "MINISTRY OF SPORTS AND COMMUNITY Expenditure EMPOWERMENT",
       "total": 66952191,
       "programmes": [
         {
@@ -733,6 +755,7 @@
     },
     "59": {
       "page": 499,
+      "name": "MINISTRY OF ENVIRONMENT, NATIONAL Expenditure BEAUTIFICATION AND FISHERIES",
       "total": 121686086,
       "programmes": [
         {
@@ -770,6 +793,7 @@
     },
     "63": {
       "page": 526,
+      "name": "MINISTRY OF TECHNOLOGICAL AND VOCATIONAL TRAINING",
       "total": 285919602,
       "programmes": [
         {
@@ -803,6 +827,7 @@
     },
     "83": {
       "page": 550,
+      "name": "MINISTRY OF AGRICULTURE, FOOD AND NUTRITIONAL SECURITY",
       "total": 112008129,
       "programmes": [
         {
@@ -845,6 +870,7 @@
     },
     "84": {
       "page": 589,
+      "name": "MINISTRY OF LABOUR, SOCIAL SECURITY AND THIRD SECTOR",
       "total": 20973014,
       "programmes": [
         {
@@ -877,6 +903,7 @@
     },
     "86": {
       "page": 612,
+      "name": "MINISTRY OF HEALTH AND WELLNESS",
       "total": 485755980,
       "programmes": [
         {
@@ -924,6 +951,7 @@
     },
     "93": {
       "page": 664,
+      "name": "MINISTRY OF HOUSING, LANDS AND MAINTENANCE",
       "total": 136925650,
       "programmes": [
         {
@@ -966,6 +994,7 @@
     },
     "96": {
       "page": 688,
+      "name": "MINISTRY OF EDUCATION TRANSFORMATION",
       "total": 525222123,
       "programmes": [
         {

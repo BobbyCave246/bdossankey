@@ -212,6 +212,12 @@
   #sankey.is-hovering .flow.is-active{opacity:1}
   #sankey .hit{fill:transparent; cursor:pointer}
 
+  /* Spending categories link through to the ministries page. Only the
+     spending side is clickable, and only when the category carries an id. */
+  .flow.is-clickable{cursor:pointer}
+  .flow.is-clickable:focus{outline:none}
+  .flow.is-clickable:focus-visible rect{stroke:#16202a; stroke-width:2}
+
   #tooltip{
     position:absolute;
     z-index:5;
@@ -446,6 +452,7 @@
       <h3>About the citizen view</h3>
       <p>The right-hand categories are the Barbados government's own <strong>functional classification</strong> of spending (Table 5 of the Estimates), relabelled in plain language. They are not an editorial invention.</p>
       <p>Each category names the official function it comes from — hover any flow to see it. Two categories combine functions: housing with environmental protection, and police and courts with defence.</p>
+      <p><strong>Click any spending category</strong> to open <a href="ministries.html">ministries and programmes</a> — the level below these figures. Most categories do not decompose into whole ministries, because the government applies the classification below ministry level; that page shows which ones do and says so plainly for the rest.</p>
     </div>
     <div class="legend-box">
       <h3>Fiscal result</h3>
@@ -1190,6 +1197,12 @@ function attachInteractions(model, flows){
       src.textContent = 'Official classification: ' + node.from.join(' + ');
       tooltipEl.appendChild(src);
     }
+    if(flow.side === 'out' && node.id){
+      const go = document.createElement('span');
+      go.className = 't-note';
+      go.textContent = 'Click to see the ministries and programmes →';
+      tooltipEl.appendChild(go);
+    }
 
     const box = wrapEl.getBoundingClientRect();
     tooltipEl.style.left = (evt.clientX - box.left) + 'px';
@@ -1198,6 +1211,25 @@ function attachInteractions(model, flows){
 
     svg.classList.add('is-hovering');
     for(const f of flows) f.g.classList.toggle('is-active', f === flow);
+  }
+
+  /* A spending category links to the ministries page. The link is not a claim
+     that the category decomposes into ministries — most do not, and that page
+     says so — it is a way through to the underlying detail. */
+  function makeClickable(flow){
+    const {node} = flow.item;
+    const href = 'ministries.html?year=' + encodeURIComponent(currentYearId || '') +
+                 '&category=' + encodeURIComponent(node.id);
+    flow.g.classList.add('is-clickable');
+    flow.g.setAttribute('role', 'link');
+    flow.g.setAttribute('tabindex', '0');
+    flow.g.setAttribute('aria-label',
+      node.label + ': ' + moneyUnit(node.value) + '. See the ministries and programmes.');
+    const go = ()=>{ location.href = href; };
+    flow.g.addEventListener('click', go);
+    flow.g.addEventListener('keydown', e=>{
+      if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); }
+    });
   }
 
   function hide(){
@@ -1210,6 +1242,7 @@ function attachInteractions(model, flows){
     flow.g.addEventListener('pointermove', e=>show(e, flow));
     flow.g.addEventListener('pointerleave', hide);
     flow.g.addEventListener('pointercancel', hide);
+    if(flow.side === 'out' && flow.item.node.id) makeClickable(flow);
   }
   wrapEl.addEventListener('pointerleave', hide);
 }
@@ -1410,6 +1443,7 @@ function setView(next){
 }
 
 let model = null;
+let currentYearId = null;   // for deep links into ministries.html
 function render(){
   drawSummary(model);
   drawChart(model);
@@ -1445,6 +1479,7 @@ async function showYear(entry){
     console.warn('Could not load', entry.file, err.message);
     return;
   }
+  currentYearId = entry.id;
   applyMeta(data.meta);
   drawYearToggle(manifest, entry.id);
   model = buildModel(data);
@@ -1462,6 +1497,7 @@ async function init(){
     const entry = manifest.years.find(y=>y.id === manifest.default) || manifest.years[0];
     try{
       const data = await loadYear(entry);
+      currentYearId = entry.id;
       applyMeta(data.meta);
       drawYearToggle(manifest, entry.id);
       model = buildModel(data);
