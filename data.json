@@ -4,25 +4,73 @@
     "subtitle": "Citizen view of government revenue and spending • FY2025/26 revised estimates • BDS$ millions",
     "unit": "BDS$ millions",
     "unitShort": "M",
+    "unitPerPerson": "BDS$ per resident, per year",
     "currencySymbol": "$",
     "source": "Source: Barbados Parliament Mid-Year Review Report FY2025/26.",
-    "sourceNote": "Revenue values are official revised estimates. Right-hand categories are a citizen-view grouping for communication and are fully editable."
+    "sourceNote": "Revenue values are official revised estimates. Right-hand categories are a citizen-view grouping for communication and are fully editable.",
+
+    "basisNote": "Figures are on the fiscal-balance basis: expenditure here excludes debt amortisation (repayment of principal), which is a financing item. Headline 'total spending' of about BDS$5.1bn quoted around the Estimates includes amortisation and is therefore not comparable with the BDS$3.9bn shown here.",
+
+    "population": {
+      "value": 261692,
+      "year": 2025,
+      "label": "Barbados Statistical Service, end-2025",
+      "note": "Official national estimate. International sources differ materially — the World Bank puts 2025 population near 282,600, which would lower every per-resident figure by about 8%. Verify against the current BSS publication before publishing."
+    },
+
+    "highlights": {
+      "debtId": "debt",
+      "compareIds": ["education", "healthcare"]
+    },
+
+    "sources": [
+      {
+        "label": "Ministry of Finance, Economic Affairs & Investment — Mid-Year Review FY2025/26",
+        "url": "https://www.barbadosparliament.com/uploads/sittings/attachments/68eeefee95cbd02fdee0e1c474878743.pdf",
+        "supports": "Revenue by category and expenditure for the fiscal year",
+        "verified": false
+      },
+      {
+        "label": "Barbados Medium-Term Fiscal Framework 2025/26 to 2027/28 (Appendix I)",
+        "url": "https://www.barbadosparliament.com/uploads/sittings/attachments/3cbc58ce1bc360806372fa476f67157f.pdf",
+        "supports": "Multi-year revenue and expenditure projections",
+        "verified": false
+      },
+      {
+        "label": "Central Bank of Barbados — Review of the Economy, January–March 2026",
+        "url": "https://www.centralbank.org.bb/news/economic-reviews/economic-review-january-march-2026",
+        "supports": "FY2025/26 outturn: primary surplus BDS$647.3m, overall deficit BDS$58.3m (0.4% of GDP), debt 94.6% of GDP",
+        "verified": false
+      },
+      {
+        "label": "Barbados Statistical Service",
+        "url": "https://stats.gov.bb/statistics/",
+        "supports": "Population used for per-resident figures",
+        "verified": false
+      },
+      {
+        "label": "IMF Country Report No. 25/153 — Barbados",
+        "url": "https://www.imf.org/-/media/files/publications/cr/2025/english/1brbea2025001-print-pdf.pdf",
+        "supports": "Independent cross-check of the fiscal accounts",
+        "verified": false
+      }
+    ]
   },
   "revenue": [
-    { "label": "Income & profits",       "value": 1379.13, "note": "Personal and company taxes" },
-    { "label": "Goods & services",       "value": 1655.47, "note": "Mainly VAT and similar taxes" },
-    { "label": "International trade",    "value": 285.78,  "note": "Import duties and trade taxes" },
-    { "label": "Property",               "value": 226.38,  "note": "Land and property taxes" },
-    { "label": "Non-tax revenue",        "value": 194.69,  "note": "Fees, charges and other income" },
-    { "label": "Other revenue & grants", "value": 123.06,  "note": "Other inflows and grants" }
+    { "id": "income-profits",  "label": "Income & profits",       "value": 1379.13, "note": "Personal and company taxes" },
+    { "id": "goods-services",  "label": "Goods & services",       "value": 1655.47, "note": "Mainly VAT and similar taxes" },
+    { "id": "trade",           "label": "International trade",    "value": 285.78,  "note": "Import duties and trade taxes" },
+    { "id": "property",        "label": "Property",               "value": 226.38,  "note": "Land and property taxes" },
+    { "id": "non-tax",         "label": "Non-tax revenue",        "value": 194.69,  "note": "Fees, charges and other income" },
+    { "id": "other-grants",    "label": "Other revenue & grants", "value": 123.06,  "note": "Other inflows and grants" }
   ],
   "spending": [
-    { "label": "Education & skills",                 "value": 289.80,  "note": "Schools, training, tertiary support" },
-    { "label": "Healthcare & wellness",              "value": 376.20,  "note": "Hospitals, clinics, public health" },
-    { "label": "Welfare, pensions & social support", "value": 650.00,  "note": "Transfers to households and support schemes" },
-    { "label": "Roads, water & infrastructure",      "value": 549.80,  "note": "Roads, water works, physical infrastructure" },
-    { "label": "Police, courts & public safety",     "value": 280.00,  "note": "Security, justice and safety" },
-    { "label": "Public administration",              "value": 1041.91, "note": "Core government operations and services" },
-    { "label": "Debt interest",                      "value": 718.02,  "note": "The cost of servicing debt", "tone": "debt" }
+    { "id": "education",      "label": "Education & skills",                 "value": 289.80,  "note": "Schools, training, tertiary support" },
+    { "id": "healthcare",     "label": "Healthcare & wellness",              "value": 376.20,  "note": "Hospitals, clinics, public health" },
+    { "id": "welfare",        "label": "Welfare, pensions & social support", "value": 650.00,  "note": "Transfers to households and support schemes" },
+    { "id": "infrastructure", "label": "Roads, water & infrastructure",      "value": 549.80,  "note": "Roads, water works, physical infrastructure" },
+    { "id": "safety",         "label": "Police, courts & public safety",     "value": 280.00,  "note": "Security, justice and safety" },
+    { "id": "administration", "label": "Public administration",              "value": 1041.91, "note": "Core government operations and services" },
+    { "id": "debt",           "label": "Debt interest",                      "value": 718.02,  "note": "The cost of servicing debt", "tone": "debt" }
   ]
 }

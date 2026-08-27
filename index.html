@@ -70,6 +70,85 @@
     font-size:13px;
   }
 
+  .viewbar{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    gap:12px;
+    margin-top:16px;
+  }
+  .toggle{
+    display:inline-flex;
+    border:1px solid var(--border);
+    border-radius:999px;
+    background:#f1f4f8;
+    padding:3px;
+  }
+  .toggle button{
+    appearance:none;
+    border:0;
+    background:transparent;
+    font:inherit;
+    font-size:14px;
+    font-weight:700;
+    color:var(--muted);
+    padding:8px 18px;
+    border-radius:999px;
+    cursor:pointer;
+  }
+  .toggle button.is-active{
+    background:var(--brand);
+    color:#fff;
+    box-shadow:0 1px 4px rgba(11,47,107,.28);
+  }
+  .toggle button:focus-visible{
+    outline:3px solid var(--gold-focus);
+    outline-offset:2px;
+  }
+  .popnote{
+    margin:0;
+    font-size:12px;
+    color:var(--muted);
+    max-width:520px;
+  }
+
+  .headlines{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:16px;
+  }
+  .headline{
+    border:1px solid var(--border);
+    border-left:5px solid var(--brand);
+    border-radius:12px;
+    padding:14px 16px;
+    background:#fbfcfe;
+  }
+  .headline.is-debt{border-left-color:var(--deficit)}
+  .headline .hk{
+    font-size:12px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    color:#4a5561;
+    margin-bottom:6px;
+  }
+  .headline .hv{
+    font-size:32px;
+    font-weight:900;
+    line-height:1;
+    color:var(--brand);
+  }
+  .headline.is-debt .hv{color:var(--deficit)}
+  .headline .hs{
+    margin-top:7px;
+    font-size:13px;
+    color:var(--muted);
+    line-height:1.4;
+  }
+
   .summary{
     display:grid;
     grid-template-columns:repeat(4,1fr);
@@ -178,6 +257,54 @@
     line-height:1.45;
   }
 
+  .sources-box{
+    margin-top:14px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:14px 16px;
+    background:#fff;
+  }
+  .sources-box h3{
+    margin:0 0 10px;
+    font-size:16px;
+    color:#172432;
+  }
+  .basis{
+    margin:0 0 10px;
+    font-size:13px;
+    line-height:1.5;
+    color:var(--muted);
+    border-left:3px solid var(--gold-focus);
+    padding-left:10px;
+  }
+  ul.sources{
+    margin:0;
+    padding-left:18px;
+    font-size:13px;
+    line-height:1.6;
+    color:var(--muted);
+  }
+  ul.sources a{color:var(--brand)}
+  ul.sources .supports{color:var(--muted)}
+  .badge{
+    display:inline-block;
+    font-size:10px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.5px;
+    padding:1px 6px;
+    border-radius:999px;
+    margin-left:6px;
+    vertical-align:1px;
+  }
+  .badge.no{background:#fdf6e7; color:#6b5312; border:1px solid #ecd9a8}
+  .badge.yes{background:var(--soft-green); color:var(--surplus); border:1px solid var(--surplus-border)}
+  .caveat{
+    margin:10px 0 0;
+    font-size:12px;
+    color:var(--muted);
+  }
+
   .edit-note{
     margin-top:16px;
     padding:12px 14px;
@@ -213,6 +340,7 @@
 
   @media (max-width:1100px){
     .summary{grid-template-columns:1fr 1fr}
+    .headlines{grid-template-columns:1fr}
     .legend-row{grid-template-columns:1fr}
     h1{font-size:32px}
     .subtitle{font-size:18px}
@@ -278,6 +406,16 @@
     </svg>
   </div>
 
+  <div class="viewbar">
+    <div class="toggle" role="group" aria-label="Show figures as">
+      <button type="button" id="viewTotal" class="is-active" aria-pressed="true">Whole budget</button>
+      <button type="button" id="viewPerson" aria-pressed="false">Per resident</button>
+    </div>
+    <p class="popnote" id="popNote"></p>
+  </div>
+
+  <div id="headlines" class="headlines"></div>
+
   <div id="summary" class="summary"></div>
 
   <div id="sankeyWrap">
@@ -306,6 +444,15 @@
     </div>
   </div>
 
+  <div class="sources-box">
+    <h3>Where these figures come from</h3>
+    <p id="basisNote" class="basis"></p>
+    <ul id="sourceList" class="sources"></ul>
+    <p class="caveat">Links are to the official publications the figures are drawn from. Each entry is marked
+      <strong>unverified</strong> until someone has checked the numbers in this file line by line against the
+      document it cites.</p>
+  </div>
+
   <div class="edit-note" id="editNote">
     <strong>Editing:</strong> the figures live in <code>data.json</code> next to this file — change the labels, notes or values there and the chart redraws.
     If <code>data.json</code> cannot be loaded (for example when opening this file directly from disk in some browsers), the chart falls back to the copy of the same data embedded under <code>EDIT DATA HERE</code> in this file.
@@ -331,26 +478,40 @@ const DEFAULT_DATA = {
     subtitle:"Citizen view of government revenue and spending • FY2025/26 revised estimates • BDS$ millions",
     unit:"BDS$ millions",
     unitShort:"M",
+    unitPerPerson:"BDS$ per resident, per year",
     currencySymbol:"$",
+    basisNote:"Figures are on the fiscal-balance basis: expenditure here excludes debt amortisation, which is a financing item.",
+    population:{ value:261692, year:2025, label:"Barbados Statistical Service, end-2025" },
+    highlights:{ debtId:"debt", compareIds:["education","healthcare"] },
+    sources:[
+      { label:"Ministry of Finance — Mid-Year Review FY2025/26",
+        url:"https://www.barbadosparliament.com/uploads/sittings/attachments/68eeefee95cbd02fdee0e1c474878743.pdf",
+        supports:"Revenue by category and expenditure", verified:false },
+      { label:"Central Bank of Barbados — Review of the Economy, January–March 2026",
+        url:"https://www.centralbank.org.bb/news/economic-reviews/economic-review-january-march-2026",
+        supports:"FY2025/26 outturn and debt ratio", verified:false },
+      { label:"Barbados Statistical Service", url:"https://stats.gov.bb/statistics/",
+        supports:"Population used for per-resident figures", verified:false }
+    ],
     source:"Source: Barbados Parliament Mid-Year Review Report FY2025/26.",
     sourceNote:"Revenue values are official revised estimates. Right-hand categories are a citizen-view grouping for communication and are fully editable."
   },
   revenue:[
-    { label:"Income & profits",       value:1379.13, note:"Personal and company taxes" },
-    { label:"Goods & services",       value:1655.47, note:"Mainly VAT and similar taxes" },
-    { label:"International trade",    value:285.78,  note:"Import duties and trade taxes" },
-    { label:"Property",               value:226.38,  note:"Land and property taxes" },
-    { label:"Non-tax revenue",        value:194.69,  note:"Fees, charges and other income" },
-    { label:"Other revenue & grants", value:123.06,  note:"Other inflows and grants" }
+    { id:"income-profits", label:"Income & profits",       value:1379.13, note:"Personal and company taxes" },
+    { id:"goods-services", label:"Goods & services",       value:1655.47, note:"Mainly VAT and similar taxes" },
+    { id:"trade",          label:"International trade",    value:285.78,  note:"Import duties and trade taxes" },
+    { id:"property",       label:"Property",               value:226.38,  note:"Land and property taxes" },
+    { id:"non-tax",        label:"Non-tax revenue",        value:194.69,  note:"Fees, charges and other income" },
+    { id:"other-grants",   label:"Other revenue & grants", value:123.06,  note:"Other inflows and grants" }
   ],
   spending:[
-    { label:"Education & skills",                 value:289.80,  note:"Schools, training, tertiary support" },
-    { label:"Healthcare & wellness",              value:376.20,  note:"Hospitals, clinics, public health" },
-    { label:"Welfare, pensions & social support", value:650.00,  note:"Transfers to households and support schemes" },
-    { label:"Roads, water & infrastructure",      value:549.80,  note:"Roads, water works, physical infrastructure" },
-    { label:"Police, courts & public safety",     value:280.00,  note:"Security, justice and safety" },
-    { label:"Public administration",              value:1041.91, note:"Core government operations and services" },
-    { label:"Debt interest",                      value:718.02,  note:"The cost of servicing debt", tone:"debt" }
+    { id:"education",      label:"Education & skills",                 value:289.80,  note:"Schools, training, tertiary support" },
+    { id:"healthcare",     label:"Healthcare & wellness",              value:376.20,  note:"Hospitals, clinics, public health" },
+    { id:"welfare",        label:"Welfare, pensions & social support", value:650.00,  note:"Transfers to households and support schemes" },
+    { id:"infrastructure", label:"Roads, water & infrastructure",      value:549.80,  note:"Roads, water works, physical infrastructure" },
+    { id:"safety",         label:"Police, courts & public safety",     value:280.00,  note:"Security, justice and safety" },
+    { id:"administration", label:"Public administration",              value:1041.91, note:"Core government operations and services" },
+    { id:"debt",           label:"Debt interest",                      value:718.02,  note:"The cost of servicing debt", tone:"debt" }
   ]
 };
 
@@ -406,6 +567,7 @@ const CSS_VARS = {
   '--soft-red':THEME.softRed,
   '--soft-green':THEME.softGreen,
   '--soft-gray':THEME.softGray,
+  '--gold-focus':THEME.gold,
   '--soft-blue':THEME.softBlue
 };
 Object.entries(CSS_VARS).forEach(([k,v])=>document.documentElement.style.setProperty(k,v));
@@ -447,6 +609,8 @@ const summaryEl = document.getElementById('summary');
 const tooltipEl = document.getElementById('tooltip');
 const wrapEl = document.getElementById('sankeyWrap');
 const tableEl = document.getElementById('dataTable');
+const headlinesEl = document.getElementById('headlines');
+const popNoteEl = document.getElementById('popNote');
 const NS = 'http://www.w3.org/2000/svg';
 
 /* ---------------------------- helpers ---------------------------- */
@@ -476,12 +640,42 @@ function txt(parent, x, y, content, opts={}){
 function sum(arr){ return arr.reduce((a,b)=>a + b.value, 0); }
 function round2(v){ return Math.round(v*100)/100; }
 
-/* Plain number, used where the unit is already established by a header. */
-function money(v){
+/* ---------------------------------------------------------
+   Value display. Every figure in the source data is a total in
+   millions; the "per resident" view divides by population. It is a
+   single constant divisor, so the ribbons are identical in both views —
+   only the numbers printed on them change.
+   --------------------------------------------------------- */
+let view = 'total';          // 'total' | 'person'
+let population = null;       // residents, from meta.population
+let currencySymbol = '';
+let unitShort = '';
+
+function perPerson(vMillions){ return vMillions * 1e6 / population; }
+
+/* Fixed formatters, for places that always state one basis. */
+function moneyMillions(v){
   return v.toLocaleString('en-US',{minimumFractionDigits:2, maximumFractionDigits:2});
 }
-/* Number carrying its unit, used anywhere the figure stands alone. */
-let moneyUnit = v => money(v);
+function moneyPerPerson(v){
+  return population ? perPerson(v).toLocaleString('en-US',{maximumFractionDigits:0}) : '—';
+}
+
+/* Plain number in the current view, where a header states the unit. */
+function money(v){
+  return view === 'person' ? moneyPerPerson(v) : moneyMillions(v);
+}
+/* Number carrying its unit, for figures that stand alone. */
+function moneyUnit(v){
+  return view === 'person'
+    ? `${currencySymbol}${moneyPerPerson(v)}`
+    : `${currencySymbol}${moneyMillions(v)}${unitShort}`;
+}
+function unitLabel(meta){
+  return view === 'person'
+    ? (meta.unitPerPerson || 'per resident, per year')
+    : meta.unit;
+}
 
 function pct(v, total){
   if(!total) return '0.0%';
@@ -542,6 +736,9 @@ function wrapText(text, maxWidth, size, weight, maxLines){
 
 function normaliseRow(row, defaultTone){
   return {
+    // A stable id lets headline comparisons and future deep links refer to a
+    // category without depending on its display label.
+    id: row.id ? String(row.id) : '',
     label: String(row.label ?? 'Unlabelled'),
     value: Number(row.value),
     note: row.note ? String(row.note) : '',
@@ -755,7 +952,7 @@ function drawChart(model){
   titleNode.textContent = data.meta.title;
   const descNode = $el('desc',{id:descId}, svg);
   descNode.textContent =
-    `Sankey diagram in ${data.meta.unit}. Revenue of ${money(model.totalRevenue)} flows into a budget ` +
+    `Sankey diagram in ${unitLabel(data.meta)}. Revenue of ${money(model.totalRevenue)} flows into a budget ` +
     `envelope of ${money(envelope)}, of which ${money(totalSpending)} is distributed across ` +
     `${data.spending.length} citizen-view categories. ` +
     (net < 0
@@ -803,7 +1000,7 @@ function drawChart(model){
   $el('rect',{x:headerRightX, y:cfg.headerY, width:cfg.headerRightW, height:cfg.headerH, rx:10, fill:THEME.brand}, svg);
   txt(svg, headerRightX + cfg.headerRightW/2, cfg.headerY + 27, 'WHAT CITIZENS GET FROM IT',
       {size:18, weight:800, fill:THEME.onBrand, anchor:'middle', tracking:.4});
-  txt(svg, cfg.headerLeftX, cfg.headerY - 14, `All figures in ${data.meta.unit}`, {size:12, weight:700, fill:THEME.muted});
+  txt(svg, cfg.headerLeftX, cfg.headerY - 14, `All figures in ${unitLabel(data.meta)}`, {size:12, weight:700, fill:THEME.muted});
 
   // ---- ribbons (drawn first so bars and text sit on top) ----
   const flowLayer = $el('g',{}, svg);
@@ -976,30 +1173,93 @@ function attachInteractions(model, flows){
   wrapEl.addEventListener('pointerleave', hide);
 }
 
+/* --------------------------- headlines --------------------------- */
+
+/* Derives the plain-language facts the totals already contain but do not
+   state. Every card is skipped rather than guessed at if the data it needs
+   (a population, or a category carrying the referenced id) is absent. */
+function drawHeadlines(model){
+  const meta = model.data.meta;
+  const h = meta.highlights || {};
+  const byId = {};
+  for(const row of model.data.spending){ if(row.id) byId[row.id] = row; }
+  const debt = h.debtId ? byId[h.debtId] : null;
+
+  const cards = [];
+
+  if(population){
+    cards.push({
+      k:'Each resident’s share',
+      v:`${currencySymbol}${moneyPerPerson(model.totalSpending)}`,
+      s:`Total spending for the year divided by ${population.toLocaleString('en-US')} residents.`
+    });
+  }
+
+  if(debt && population){
+    cards.push({
+      cls:'is-debt',
+      k:'Of that, debt interest',
+      v:`${currencySymbol}${moneyPerPerson(debt.value)}`,
+      s:`Every resident’s share of servicing the debt — ${pct(debt.value, model.totalSpending)} of all spending, before a single service is delivered.`
+    });
+  }
+
+  if(debt){
+    for(const id of (h.compareIds || [])){
+      const other = byId[id];
+      if(!other || !other.value) continue;
+      const ratio = debt.value / other.value;
+      if(ratio < 1) continue;   // only worth stating when debt is the larger side
+      cards.push({
+        cls:'is-debt',
+        k:`Debt interest vs ${other.label.toLowerCase()}`,
+        v:`${ratio.toFixed(1)}×`,
+        s:`${currencySymbol}${moneyMillions(debt.value)}${unitShort} services the debt against ${currencySymbol}${moneyMillions(other.value)}${unitShort} for ${other.label.toLowerCase()}.`
+      });
+      break;
+    }
+  }
+
+  headlinesEl.replaceChildren();
+  for(const c of cards){
+    const el = document.createElement('div');
+    el.className = 'headline' + (c.cls ? ' ' + c.cls : '');
+    const k = document.createElement('div'); k.className='hk'; k.textContent=c.k;
+    const v = document.createElement('div'); v.className='hv'; v.textContent=c.v;
+    const s = document.createElement('div'); s.className='hs'; s.textContent=c.s;
+    el.append(k,v,s);
+    headlinesEl.appendChild(el);
+  }
+  headlinesEl.style.display = cards.length ? '' : 'none';
+}
+
 /* --------------------- accessible data table --------------------- */
 
 function drawTable(model){
   const {data, totalRevenue, totalSpending, net} = model;
   const unit = data.meta.unit;
 
+  // The table always carries both bases, whichever view the chart is in.
+  const row = (label, value, note) => [label, moneyMillions(value), moneyPerPerson(value), note];
   const rows = [];
-  rows.push(['Revenue', '', '']);
-  for(const r of model.data.revenue) rows.push([r.label, money(r.value), r.note]);
-  rows.push(['Total revenue', money(totalRevenue), '']);
-  rows.push(['Spending', '', '']);
-  for(const s of model.data.spending) rows.push([s.label, money(s.value), s.note]);
-  rows.push(['Total spending', money(totalSpending), '']);
-  rows.push([net >= 0 ? 'Surplus' : 'Deficit / borrowing need', money(Math.abs(net)),
-             net >= 0 ? 'Revenue exceeded spending' : 'Spending exceeded revenue']);
+  rows.push(['Revenue', '', '', '']);
+  for(const r of model.data.revenue) rows.push(row(r.label, r.value, r.note));
+  rows.push(row('Total revenue', totalRevenue, ''));
+  rows.push(['Spending', '', '', '']);
+  for(const s of model.data.spending) rows.push(row(s.label, s.value, s.note));
+  rows.push(row('Total spending', totalSpending, ''));
+  rows.push(row(net >= 0 ? 'Surplus' : 'Deficit / borrowing need', Math.abs(net),
+                net >= 0 ? 'Revenue exceeded spending' : 'Spending exceeded revenue'));
 
   const table = document.createElement('table');
   const caption = document.createElement('caption');
-  caption.textContent = `${data.meta.title} — all figures in ${unit}`;
+  caption.textContent = `${data.meta.title} — amounts in ${unit}`
+    + (population ? `, and in ${data.meta.currencySymbol || ''} per resident using a population of ${population.toLocaleString('en-US')}` : '');
   table.appendChild(caption);
 
   const thead = document.createElement('thead');
   const headRow = document.createElement('tr');
-  for(const h of ['Category', `Amount (${unit})`, 'Description']){
+  for(const h of ['Category', `Amount (${unit})`, 'Per resident', 'Description']){
     const th = document.createElement('th');
     th.scope = 'col';
     th.textContent = h;
@@ -1009,13 +1269,13 @@ function drawTable(model){
   table.appendChild(thead);
 
   const tbody = document.createElement('tbody');
-  for(const [label, value, note] of rows){
+  for(const [label, value, perHead, note] of rows){
     const tr = document.createElement('tr');
     const th = document.createElement('th');
     th.scope = 'row';
     th.textContent = label;
     tr.appendChild(th);
-    for(const cell of [value, note]){
+    for(const cell of [value, perHead, note]){
       const td = document.createElement('td');
       td.textContent = cell;
       tr.appendChild(td);
@@ -1036,19 +1296,87 @@ function applyMeta(meta){
   document.getElementById('legendDeficit').style.color = THEME.deficit;
   document.getElementById('legendSurplus').style.color = THEME.surplus;
 
-  const symbol = meta.currencySymbol ?? '';
-  const short = meta.unitShort ?? '';
-  moneyUnit = v => `${symbol}${money(v)}${short}`;
+  currencySymbol = meta.currencySymbol ?? '';
+  unitShort = meta.unitShort ?? '';
+
+  const pop = meta.population && Number(meta.population.value);
+  population = Number.isFinite(pop) && pop > 0 ? pop : null;
+
+  // The population behind every per-resident figure is stated on the page
+  // rather than buried in the data file, and the toggle is withdrawn if the
+  // figure is missing rather than showing amounts nobody can check.
+  document.getElementById('basisNote').textContent = meta.basisNote || '';
+
+  // Source links are built from the data, so citing a new document is a data
+  // edit rather than a code edit. Links open in a new tab and carry rel
+  // attributes because they point off-site.
+  const list = document.getElementById('sourceList');
+  list.replaceChildren();
+  for(const src of (meta.sources || [])){
+    if(!src || !src.url) continue;
+    const li = document.createElement('li');
+    const a = document.createElement('a');
+    a.href = src.url;
+    a.textContent = src.label || src.url;
+    a.target = '_blank';
+    a.rel = 'noopener noreferrer';
+    li.appendChild(a);
+
+    const badge = document.createElement('span');
+    badge.className = 'badge ' + (src.verified ? 'yes' : 'no');
+    badge.textContent = src.verified ? 'verified' : 'unverified';
+    li.appendChild(badge);
+
+    if(src.supports){
+      const sup = document.createElement('span');
+      sup.className = 'supports';
+      sup.textContent = ' — ' + src.supports;
+      li.appendChild(sup);
+    }
+    list.appendChild(li);
+  }
+
+  if(population){
+    popNoteEl.textContent =
+      `Per-resident figures divide by a population of ${population.toLocaleString('en-US')}`
+      + (meta.population.label ? ` (${meta.population.label})` : '')
+      + '. Edit it in data.json.';
+  } else {
+    popNoteEl.textContent = 'Add a population to data.json to show per-resident figures.';
+    document.querySelector('.toggle').hidden = true;
+  }
+}
+
+function setView(next){
+  if(view === next) return;
+  view = next;
+  const isPerson = view === 'person';
+  const totalBtn = document.getElementById('viewTotal');
+  const personBtn = document.getElementById('viewPerson');
+  totalBtn.classList.toggle('is-active', !isPerson);
+  personBtn.classList.toggle('is-active', isPerson);
+  totalBtn.setAttribute('aria-pressed', String(!isPerson));
+  personBtn.setAttribute('aria-pressed', String(isPerson));
+  render();
+}
+
+let model = null;
+function render(){
+  drawSummary(model);
+  drawChart(model);
+  drawHeadlines(model);
+  drawTable(model);
 }
 
 async function init(){
   const {data, source} = await loadData();
   applyMeta(data.meta);
 
-  const model = buildModel(data);
-  drawSummary(model);
-  drawChart(model);
-  drawTable(model);
+  model = buildModel(data);
+  render();
+
+  document.getElementById('viewTotal').addEventListener('click', ()=>setView('total'));
+  document.getElementById('viewPerson').addEventListener('click', ()=>setView('person'));
 
   if(source === 'embedded'){
     const note = document.getElementById('editNote');
